@@ -1,6 +1,6 @@
 import React from 'react';
 import { GameMetadata } from '../types';
-import { Flame, Heart, Play, Sparkles, Star, Trophy, Zap, Layers, Rocket, Grid, Feather, Target, Cpu } from 'lucide-react';
+import { Flame, Heart, Play, Sparkles, Star, Trophy, Zap, Layers, Rocket, Grid, Feather, Target, Cpu, Swords, Users } from 'lucide-react';
 import { sound } from '../utils/audio';
 
 interface GameCardProps {
@@ -19,7 +19,9 @@ const ICON_MAP: Record<string, React.ElementType> = {
   Grid,
   Feather,
   Target,
-  Cpu
+  Cpu,
+  Swords,
+  Users
 };
 
 export const GameCard: React.FC<GameCardProps> = ({
@@ -129,10 +131,18 @@ export const GameCard: React.FC<GameCardProps> = ({
             sound.playClick();
             onPlay(game.id);
           }}
-          className="px-4 py-1.5 bg-gradient-to-r from-indigo-500 to-cyan-400 hover:from-indigo-400 hover:to-cyan-300 text-slate-950 font-bold text-xs rounded-full shadow-md shadow-indigo-500/20 flex items-center gap-1.5 transition-all transform hover:scale-105 active:scale-95 cursor-pointer"
+          className={`px-4 py-1.5 font-bold text-xs rounded-full shadow-md flex items-center gap-1.5 transition-all transform hover:scale-105 active:scale-95 cursor-pointer ${
+            game.isMultiplayerSupported
+              ? 'bg-gradient-to-r from-rose-500 to-amber-500 hover:from-rose-400 hover:to-amber-400 text-white shadow-rose-500/25 ring-1 ring-rose-400/50'
+              : 'bg-gradient-to-r from-indigo-500 to-cyan-400 hover:from-indigo-400 hover:to-cyan-300 text-slate-950 shadow-indigo-500/20'
+          }`}
         >
-          <Play className="w-3 h-3 fill-slate-950" />
-          <span>Mainkan</span>
+          {game.isMultiplayerSupported ? (
+            <Swords className="w-3.5 h-3.5 text-white" />
+          ) : (
+            <Play className="w-3 h-3 fill-slate-950" />
+          )}
+          <span>{game.isMultiplayerSupported ? 'Mabar 1v1' : 'Mainkan'}</span>
         </button>
       </div>
     </div>

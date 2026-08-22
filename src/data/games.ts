@@ -2,6 +2,26 @@ import { Achievement, DailyQuest, GameMetadata, ShopCharacter } from '../types';
 
 export const GAMES_DATA: GameMetadata[] = [
   {
+    id: 'neon-pong-duel',
+    title: 'Neon Pong Duel PvP',
+    category: 'multiplayer',
+    categoryName: '🎮 Mabar Online 1v1',
+    description: 'Duel tenis meja neon real-time antar pemain! Buat Room atau gabung kode mabar, kalahkan lawan dengan fireball & split shots!',
+    tagline: 'Duel 1 vs 1 real-time online dengan teman',
+    rating: 5.0,
+    plays: 28900,
+    tags: ['Mabar', 'Multiplayer', '1v1 Online', 'PvP', 'Neon Duel'],
+    bannerGradient: 'from-fuchsia-600 via-rose-600 to-amber-600',
+    accentColor: '#f43f5e',
+    iconName: 'Swords',
+    thumbnailBadge: '🎮 MABAR ONLINE 1V1',
+    isMultiplayerSupported: true,
+    controls: {
+      keyboard: ['W / S atau Panah Atas / Bawah (Gerakkan Paddle)', 'Spasi (Smash / Power Shot)'],
+      touch: 'Geser jari ke atas dan ke bawah pada paddle layarmu'
+    }
+  },
+  {
     id: 'cyber-runner',
     title: 'Cyber Dash Neon',
     category: 'action',
@@ -205,6 +225,17 @@ export const INITIAL_ACHIEVEMENTS: Achievement[] = [
     rewardXp: 150,
     reqType: 'favorites',
     reqTarget: 3
+  },
+  {
+    id: 'mabar-champion',
+    title: 'Gladiator Duel Mabar',
+    description: 'Menangkan duel di Neon Pong PvP Online',
+    icon: 'Swords',
+    rewardCoins: 120,
+    rewardXp: 300,
+    reqType: 'games_played',
+    reqTarget: 1,
+    gameId: 'neon-pong-duel'
   }
 ];
 
@@ -219,6 +250,18 @@ export const INITIAL_QUESTS: DailyQuest[] = [
     maxProgress: 2,
     completed: false,
     claimed: false
+  },
+  {
+    id: 'quest-mabar',
+    title: 'Tantangan Duel Mabar',
+    desc: 'Mainkan 1 ronde di Neon Pong Duel PvP',
+    rewardCoins: 75,
+    rewardXp: 150,
+    progress: 0,
+    maxProgress: 1,
+    completed: false,
+    claimed: false,
+    gameId: 'neon-pong-duel'
   },
   {
     id: 'quest-2',

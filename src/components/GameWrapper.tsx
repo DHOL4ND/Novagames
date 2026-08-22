@@ -11,19 +11,22 @@ import { Cyber2048 } from '../games/Cyber2048';
 import { FlappyCyber } from '../games/FlappyCyber';
 import { MonsterStrike } from '../games/MonsterStrike';
 import { MemoryMatrix } from '../games/MemoryMatrix';
+import { NeonPongGame } from '../games/NeonPongGame';
 
 interface GameWrapperProps {
   game: GameMetadata;
   profile: PlayerProfile;
   onBack: () => void;
   onGameOver: (gameId: string, score: number, coins: number) => void;
+  onNotify?: (title: string, desc: string, icon?: string) => void;
 }
 
 export const GameWrapper: React.FC<GameWrapperProps> = ({
   game,
   profile,
   onBack,
-  onGameOver
+  onGameOver,
+  onNotify
 }) => {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [muted, setMuted] = useState(sound.getMuted());
@@ -80,6 +83,16 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({
         return <MonsterStrike key={restartKey} {...gameProps} />;
       case 'memory-matrix':
         return <MemoryMatrix key={restartKey} {...gameProps} />;
+      case 'neon-pong-duel':
+        return (
+          <NeonPongGame
+            key={restartKey}
+            profile={profile}
+            onExit={onBack}
+            onGameOver={(gId, score, coins) => onGameOver(gId, score, coins)}
+            onNotify={(title, desc, icon) => onNotify?.(title, desc, icon)}
+          />
+        );
       default:
         return <div className="text-white p-8">Game tidak ditemukan</div>;
     }

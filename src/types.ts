@@ -1,4 +1,4 @@
-export type GameCategory = 'all' | 'action' | 'arcade' | 'puzzle' | 'reflex' | 'casual';
+export type GameCategory = 'all' | 'action' | 'arcade' | 'puzzle' | 'reflex' | 'casual' | 'multiplayer';
 
 export interface GameMetadata {
   id: string;
@@ -14,6 +14,7 @@ export interface GameMetadata {
   accentColor: string;
   iconName: string;
   thumbnailBadge?: string;
+  isMultiplayerSupported?: boolean;
   controls: {
     keyboard: string[];
     touch: string;
@@ -55,7 +56,7 @@ export interface Achievement {
   icon: string;
   rewardCoins: number;
   rewardXp: number;
-  reqType: 'games_played' | 'score' | 'favorites' | 'coins' | 'quest';
+  reqType: 'games_played' | 'score' | 'favorites' | 'coins' | 'quest' | 'multiplayer_wins';
   reqTarget: number;
   gameId?: string;
 }
@@ -82,10 +83,50 @@ export interface LeaderboardPlayer {
   level: number;
   xp: number;
   totalGamesPlayed: number;
-  tier: 'Bronze' | 'Silver' | 'Gold' | 'Platinum' | 'Diamond' | 'Master' | 'Grandmaster' | 'Nova Legend';
+  tier: 'Bronze' | 'Silver' | 'Gold' | 'Platinum' | 'Diamond' | 'Master' | 'Grandmaster' | 'Nova Legend' | 'Nova Supreme';
   tierColor: string;
   title: string;
   badge?: string;
   isCurrentPlayer?: boolean;
   gameHighScores?: Record<string, number>;
+}
+
+// Multiplayer Room & Game State Interfaces
+export interface RoomPlayer {
+  id: string;
+  name: string;
+  avatar: string;
+  avatarIcon: string;
+  level: number;
+  isHost: boolean;
+  ready: boolean;
+  score: number;
+  paddleY?: number; // 0 to 1 ratio
+  connectedAt: number;
+  lastPing: number;
+}
+
+export interface MultiplayerRoom {
+  id: string; // e.g. "ROOM-8821"
+  code: string; // 4-letter/digit code e.g. "8821"
+  gameId: string;
+  status: 'waiting' | 'starting' | 'playing' | 'ended';
+  hostId: string;
+  players: Record<string, RoomPlayer>;
+  ball?: {
+    x: number; // 0 to 100
+    y: number; // 0 to 100
+    vx: number;
+    vy: number;
+    speed: number;
+    isFireball?: boolean;
+    lastHitter?: string;
+  };
+  score1: number;
+  score2: number;
+  winnerId?: string;
+  winnerName?: string;
+  maxScore: number;
+  createdAt: number;
+  updatedAt: number;
 }

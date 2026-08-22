@@ -39,6 +39,7 @@ import {
   Search,
   ShoppingBag,
   Sparkles,
+  Swords,
   Trophy,
   User,
   Zap
@@ -46,6 +47,7 @@ import {
 
 const CATEGORIES: { id: GameCategory | 'favorites'; label: string; icon: string }[] = [
   { id: 'all', label: 'Semua Game', icon: '🎮' },
+  { id: 'multiplayer', label: '🎮 Mabar Online 1v1', icon: '⚔️' },
   { id: 'favorites', label: 'Favorit Saya', icon: '❤️' },
   { id: 'action', label: 'Aksi & Runner', icon: '⚡' },
   { id: 'arcade', label: 'Arkade Klasik', icon: '🕹️' },
@@ -279,6 +281,7 @@ export default function App() {
         profile={profile}
         onBack={() => setActiveGameId(null)}
         onGameOver={handleGameOver}
+        onNotify={(title, desc, icon) => setToastMessage({ title, desc, icon: icon || '✨' })}
       />
     );
   }
@@ -335,12 +338,21 @@ export default function App() {
               {/* Quick Actions in Hero */}
               <div className="flex flex-wrap items-center gap-3 mt-6">
                 <button
+                  id="btn-hero-mabar"
+                  onClick={() => handlePlayGame('neon-pong-duel')}
+                  className="px-6 py-3.5 bg-gradient-to-r from-rose-500 via-pink-500 to-amber-500 hover:from-rose-400 hover:to-amber-400 text-white font-black text-sm rounded-full shadow-lg shadow-rose-500/30 flex items-center gap-2 transform hover:scale-105 active:scale-95 transition-all cursor-pointer animate-pulse"
+                >
+                  <Swords className="w-4 h-4 text-white" />
+                  <span>🎮 Mabar Online 1v1</span>
+                </button>
+
+                <button
                   id="btn-hero-play-featured"
                   onClick={() => handlePlayGame('cyber-runner')}
-                  className="px-6 py-3.5 bg-gradient-to-r from-indigo-500 to-cyan-400 hover:from-indigo-400 hover:to-cyan-300 text-slate-950 font-bold text-sm rounded-full shadow-lg shadow-indigo-500/25 flex items-center gap-2 transform hover:scale-105 active:scale-95 transition-all cursor-pointer"
+                  className="px-5 py-3.5 bg-gradient-to-r from-indigo-500 to-cyan-400 hover:from-indigo-400 hover:to-cyan-300 text-slate-950 font-bold text-sm rounded-full shadow-lg shadow-indigo-500/25 flex items-center gap-2 transform hover:scale-105 active:scale-95 transition-all cursor-pointer"
                 >
                   <Play className="w-4 h-4 fill-slate-950" />
-                  <span>Main Cyber Dash</span>
+                  <span>Main Solo</span>
                 </button>
 
                 <button
