@@ -18,18 +18,20 @@ export const ShopModal: React.FC<ShopModalProps> = ({
   onUpdateProfile,
   onNotify
 }) => {
-  const [filterRarity, setFilterRarity] = useState<'all' | 'limited' | 'rare' | 'epic' | 'legendary'>('all');
+  const [filterRarity, setFilterRarity] = useState<'all' | 'limited' | 'kelipatan100' | 'shop' | 'rare' | 'epic' | 'legendary'>('all');
   const [selectedChar, setSelectedChar] = useState<ShopCharacter>(() => {
     return SHOP_CHARACTERS.find(c => c.id === profile.avatar) || SHOP_CHARACTERS[0];
   });
 
   const unlockedList = profile.unlockedAvatars && profile.unlockedAvatars.length > 0
     ? profile.unlockedAvatars
-    : ['cyber-samurai', 'pixel-wizard'];
+    : ['cyber-samurai', 'pixel-wizard', 'retro-gamer'];
 
   const filteredCharacters = SHOP_CHARACTERS.filter(char => {
     if (filterRarity === 'all') return true;
     if (filterRarity === 'limited') return char.isLimitedLevelReward;
+    if (filterRarity === 'kelipatan100') return char.isLimitedLevelReward && (char.minLevel || 0) >= 100;
+    if (filterRarity === 'shop') return !char.isLimitedLevelReward && char.price > 0;
     return char.rarity === filterRarity;
   });
 
@@ -210,7 +212,9 @@ export const ShopModal: React.FC<ShopModalProps> = ({
             {(
               [
                 { id: 'all', label: 'Semua Karakter' },
-                { id: 'limited', label: '⭐ Hadiah Level (Limited)' },
+                { id: 'kelipatan100', label: '🔥 Kelipatan 100 (Limited)' },
+                { id: 'limited', label: '⭐ Semua Hadiah Level' },
+                { id: 'shop', label: '🪙 Toko Koin' },
                 { id: 'rare', label: 'Rare' },
                 { id: 'epic', label: 'Epic' },
                 { id: 'legendary', label: 'Legendary' }
@@ -224,9 +228,13 @@ export const ShopModal: React.FC<ShopModalProps> = ({
                 }}
                 className={`px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer whitespace-nowrap ${
                   filterRarity === item.id
-                    ? item.id === 'limited'
+                    ? item.id === 'kelipatan100'
+                      ? 'bg-gradient-to-r from-red-500 via-amber-500 to-yellow-400 text-slate-950 font-black shadow-md shadow-orange-500/30'
+                      : item.id === 'limited'
                       ? 'bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 font-black shadow-md shadow-amber-500/30'
                       : 'bg-indigo-600 text-white font-bold shadow-md shadow-indigo-600/20'
+                    : item.id === 'kelipatan100'
+                    ? 'bg-orange-500/15 hover:bg-orange-500/25 text-orange-300 border border-orange-500/50'
                     : item.id === 'limited'
                     ? 'bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/40'
                     : 'bg-slate-900/60 hover:bg-slate-800 text-slate-400 hover:text-slate-200 border border-slate-800/60'

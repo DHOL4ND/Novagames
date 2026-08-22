@@ -527,15 +527,22 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
 
             <div className="space-y-2">
               {[
-                { name: 'Nova Supreme', lv: 'Lv. 30', color: 'from-yellow-300 via-orange-500 to-purple-600', badge: '⚡ SUPREME', reward: '⚡ Genesis Chrono', desc: 'Kasta tertinggi penguasa dewa arkade' },
-                { name: 'Nova Legend', lv: 'Lv. 20 - 29', color: 'from-amber-400 via-pink-500 to-purple-600', badge: '👑 LEGEND', reward: '👑 Shadow Overclock', desc: 'Peringkat elit kasta tertinggi gamer Nova Arcade' },
-                { name: 'Grandmaster', lv: 'Lv. 15 - 19', color: 'from-red-500 to-rose-600', badge: '🔥 GRANDMASTER', reward: '🧝‍♀️ Cyber Valkyrie', desc: 'Pemain elit dengan penguasaan seluruh game' },
-                { name: 'Master', lv: 'Lv. 10 - 14', color: 'from-purple-500 to-indigo-600', badge: '⚡ MASTER', reward: '🐉 Ryu Matrix Dragon', desc: 'Veteran dengan rekor skor dan combo tinggi' },
-                { name: 'Diamond', lv: 'Lv. 7 - 9', color: 'from-cyan-400 to-blue-600', badge: '💎 DIAMOND', reward: 'Hadiah XP & Koin Berlimpah', desc: 'Pemain mahir dengan konsistensi permainan tinggi' },
-                { name: 'Platinum', lv: 'Lv. 5 - 6', color: 'from-teal-400 to-emerald-600', badge: '🛡️ PLATINUM', reward: '👻 Phantom Glitch (Lv.6)', desc: 'Pemain reguler yang aktif menuntaskan misi' },
-                { name: 'Gold', lv: 'Lv. 3 - 4', color: 'from-yellow-400 to-amber-600', badge: '⭐ GOLD', reward: '🥷 Neon Ninja (Lv.3)', desc: 'Mulai menguasai pola rintangan dan manuver' },
-                { name: 'Silver', lv: 'Lv. 2', color: 'from-slate-300 to-slate-500', badge: '⚔️ SILVER', reward: 'Bonus Koin +50', desc: 'Pemain berkembang yang telah memahami dasar game' },
-                { name: 'Bronze', lv: 'Lv. 1', color: 'from-amber-700 to-stone-600', badge: '🌱 BRONZE', reward: '⚔️ Cyber Samurai & 🧙‍♂️ Pixel Wizard', desc: 'Tingkat starter gamer baru' }
+                { name: 'Infinite God', lv: 'Lv. 1000', color: 'from-yellow-200 via-amber-400 to-purple-700', badge: '🌟 INFINITE GOD', reward: '🌟 Infinite Chrono God 1000', desc: 'Kasta Maha Puncak Tak Tertandingi Penguasa Level 1000' },
+                { name: 'Abyssal Titan', lv: 'Lv. 900', color: 'from-blue-700 via-indigo-900 to-amber-400', badge: '🔱 ABYSSAL', reward: '🔱 Abyssal Primordial Titan', desc: 'Pegang trisula gravitasi purba awal mula semesta' },
+                { name: 'Void Sovereign', lv: 'Lv. 800', color: 'from-slate-900 via-purple-900 to-cyan-400', badge: '🔮 VOID', reward: '🔮 Void Sovereign Oracle', desc: 'Melihat masa depan dan masa lalu seluruh arkade' },
+                { name: 'Astral Supernova', lv: 'Lv. 700', color: 'from-fuchsia-500 via-rose-500 to-orange-400', badge: '🌠 ASTRAL', reward: '🌠 Astral Supernova Dominator', desc: 'Menyerap energi ledakan supernova galaksi' },
+                { name: 'Hyper Genesis', lv: 'Lv. 600', color: 'from-cyan-300 via-blue-500 to-indigo-700', badge: '🧬 GENESIS', reward: '🧬 Hyper Genesis Architect', desc: 'Perancang untaian realitas multiverse' },
+                { name: 'Omnipotent Deity', lv: 'Lv. 500', color: 'from-yellow-300 via-amber-400 to-rose-500', badge: '✨ OMNIPOTENT', reward: '✨ Omnipotent Matrix Deity', desc: 'Dewa pencipta realitas & kode semesta' },
+                { name: 'Cosmic Leviathan', lv: 'Lv. 400', color: 'from-emerald-400 via-teal-500 to-blue-600', badge: '🐲 LEVIATHAN', reward: '🐲 Cosmic Abyss Leviathan', desc: 'Naga raksasa pemakan materi gelap' },
+                { name: 'Celestial Emperor', lv: 'Lv. 300', color: 'from-purple-500 via-pink-500 to-amber-300', badge: '🪐 CELESTIAL', reward: '🪐 Celestial Nebula Emperor', desc: 'Kaisar galaksi penjaga konstelasi kosmik' },
+                { name: 'Quantum Lord', lv: 'Lv. 200', color: 'from-violet-600 via-indigo-500 to-cyan-400', badge: '⚡ QUANTUM', reward: '⚡ Quantum Singularity Lord', desc: 'Pengendali gravitasi kuantum & singularitas' },
+                { name: 'Infernal Warlord', lv: 'Lv. 100', color: 'from-red-600 via-orange-500 to-yellow-400', badge: '🔥 INFERNAL', reward: '🔥 Infernal Nova Warlord', desc: 'Panglima penguasa magma inti bintang' },
+                { name: 'Nova Overclock', lv: 'Lv. 50 - 99', color: 'from-zinc-800 via-slate-900 to-amber-400', badge: '👑 OVERCLOCK', reward: '👑 Shadow Overclock', desc: 'Entitas kecerdasan buatan elit penguasa arkade' },
+                { name: 'Cyber Valkyrie', lv: 'Lv. 20 - 49', color: 'from-cyan-400 via-teal-400 to-emerald-500', badge: '🧝 VALKYRIE', reward: '🧝‍♀️ Cyber Valkyrie', desc: 'Prajurit abadi bersayap kuantum' },
+                { name: 'Master Ryu', lv: 'Lv. 10 - 19', color: 'from-red-500 to-amber-500', badge: '🐉 MASTER', reward: '🐉 Ryu Matrix Dragon', desc: 'Pengendali naga purba pemuntah laser' },
+                { name: 'Phantom Diamond', lv: 'Lv. 6 - 9', color: 'from-yellow-400 to-amber-600', badge: '👻 PHANTOM', reward: '👻 Phantom Glitch', desc: 'Makhluk glitch penembus tembok matriks data' },
+                { name: 'Neon Gold', lv: 'Lv. 3 - 5', color: 'from-emerald-500 to-teal-600', badge: '🥷 GOLD', reward: '🥷 Neon Ninja', desc: 'Bayangan berkecepatan cahaya' },
+                { name: 'Bronze Starter', lv: 'Lv. 1 - 2', color: 'from-cyan-500 to-blue-600', badge: '🌱 STARTER', reward: '⚔️ Cyber Samurai, 🧙‍♂️ Wizard, 🕹️ Arcade Kid', desc: 'Tingkat starter gamer baru' }
               ].map((t) => {
                 const isCurrent = t.name === tier || (tier === 'Nova Legend' && t.name === 'Nova Legend');
                 return (

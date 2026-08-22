@@ -290,6 +290,7 @@ export const INITIAL_QUESTS: DailyQuest[] = [
 ];
 
 export const SHOP_CHARACTERS: ShopCharacter[] = [
+  // --- STARTER AVATARS (GRATIS) ---
   {
     id: 'cyber-samurai',
     name: 'Cyber Samurai',
@@ -299,7 +300,7 @@ export const SHOP_CHARACTERS: ShopCharacter[] = [
     price: 0,
     minLevel: 1,
     rarity: 'common',
-    description: 'Karakter starter standar bersenjata katana energi laser.',
+    description: 'Karakter starter standar bersenjata katana energi laser neon.',
     perkText: 'Karakter Starter Gratis'
   },
   {
@@ -315,19 +316,19 @@ export const SHOP_CHARACTERS: ShopCharacter[] = [
     perkText: 'Karakter Starter Gratis'
   },
   {
-    id: 'neon-ninja',
-    name: 'Neon Ninja',
-    title: 'Bayangan Berkecepatan Cahaya',
-    icon: '🥷',
+    id: 'retro-gamer',
+    name: 'Arcade Kid 84',
+    title: 'Gamer Sejati Retro',
+    icon: '🕹️',
     color: 'from-emerald-500 to-teal-600',
     price: 0,
-    minLevel: 3,
-    isLimitedLevelReward: true,
-    levelRewardTitle: 'Hadiah Spesial Level 3',
-    rarity: 'rare',
-    description: 'Pakar infiltrasi grid rahasia dengan kecepatan manuver tinggi.',
-    perkText: '★ HADIAH LIMITED: Terbuka Otomatis Saat Capai Level 3'
+    minLevel: 1,
+    rarity: 'common',
+    description: 'Juara turnamen mesin dingdong era 80-an dengan refleks kilat.',
+    perkText: 'Karakter Starter Gratis'
   },
+
+  // --- REGULAR SHOP AVATARS (BELI DENGAN KOIN) ---
   {
     id: 'mecha-robot',
     name: 'Mecha Bot Titan',
@@ -362,6 +363,121 @@ export const SHOP_CHARACTERS: ShopCharacter[] = [
     perkText: 'Aura pesona fuchsia futuristik'
   },
   {
+    id: 'cyber-wolf',
+    name: 'Neon Shadow Wolf',
+    title: 'Serigala Malam Berburu',
+    icon: '🐺',
+    color: 'from-indigo-500 via-purple-600 to-pink-500',
+    price: 180,
+    rarity: 'rare',
+    description: 'Pemangsa tangkas berkecepatan sonik dengan insting tajam.',
+    perkText: 'Efek lolongan sonik neon'
+  },
+  {
+    id: 'alien-boss',
+    name: 'Xenon Overlord',
+    title: 'Penguasa Dimensi Luar',
+    icon: '👾',
+    color: 'from-violet-500 to-purple-800',
+    price: 220,
+    rarity: 'epic',
+    description: 'Bos penjaga gerbang arkade dengan kekuatan telekinesis kosmik.',
+    perkText: 'Mahkota hologram ungu raja arkade'
+  },
+  {
+    id: 'cyber-ninja-girl',
+    name: 'Kunoichi Laser',
+    title: 'Agen Siluman Matrix',
+    icon: '🥷',
+    color: 'from-pink-500 to-rose-600',
+    price: 260,
+    rarity: 'epic',
+    description: 'Ahli menyusup sistem dengan belati laser dan shuriken plasma.',
+    perkText: 'Jejak langkah bayangan laser'
+  },
+  {
+    id: 'cyber-dj',
+    name: 'Soundwave DJ',
+    title: 'Master Beat Synthwave',
+    icon: '🎧',
+    color: 'from-cyan-400 via-fuchsia-500 to-indigo-600',
+    price: 300,
+    rarity: 'epic',
+    description: 'Pencipta harmoni frekuensi bass yang memanipulasi ruang suara.',
+    perkText: 'Visualizer audio equalizer aktif'
+  },
+  {
+    id: 'cyber-dino',
+    name: 'Rex Cyber Mech',
+    title: 'T-Rex Cyborg Kuno',
+    icon: '🦖',
+    color: 'from-lime-500 to-emerald-700',
+    price: 350,
+    rarity: 'epic',
+    description: 'Dinosaurus purba yang dibangkitkan dengan pelindung nano-alloy.',
+    perkText: 'Aura gempa raungan mecha'
+  },
+  {
+    id: 'pixel-paladin',
+    name: 'Holy Pixel Paladin',
+    title: 'Ksatria Cahaya Suci',
+    icon: '🛡️',
+    color: 'from-yellow-400 to-amber-600',
+    price: 420,
+    rarity: 'legendary',
+    description: 'Ksatria suci penjaga keadilan arkade dengan perisai bercahaya.',
+    perkText: 'Perlindungan berkah cahaya suci'
+  },
+  {
+    id: 'mecha-phoenix',
+    name: 'Solar Phoenix Mech',
+    title: 'Burung Abadi Api Surya',
+    icon: '🦅',
+    color: 'from-amber-400 via-orange-500 to-red-600',
+    price: 500,
+    rarity: 'legendary',
+    description: 'Burung mekanik legendaris yang bangkit dari abu bintang supernova.',
+    perkText: 'Kepakan sayap kobaran surya'
+  },
+  {
+    id: 'cyber-vampire',
+    name: 'Blood Moon Count',
+    title: 'Bangsawan AI Kuno',
+    icon: '🧛‍♂️',
+    color: 'from-rose-600 via-red-800 to-slate-950',
+    price: 650,
+    rarity: 'legendary',
+    description: 'Bangsawan cyber abadi penghisap glitch data di malam bulan merah.',
+    perkText: 'Aura kelelawar hologram darah'
+  },
+  {
+    id: 'time-traveler',
+    name: 'Chrono Nomad',
+    title: 'Penjelajah Garis Waktu',
+    icon: '⏳',
+    color: 'from-teal-400 via-cyan-500 to-blue-700',
+    price: 800,
+    rarity: 'legendary',
+    description: 'Penjaga kronologi multiverse yang dapat melompati dimensi abad.',
+    perkText: 'Putaran jam kuantum misterius'
+  },
+
+  // --- EARLY STARTER LEVEL REWARD AVATARS ---
+  {
+    id: 'neon-ninja',
+    name: 'Neon Ninja',
+    title: 'Bayangan Berkecepatan Cahaya',
+    icon: '🥷',
+    color: 'from-emerald-500 to-teal-600',
+    price: 0,
+    minLevel: 3,
+    isLimitedLevelReward: true,
+    levelRewardTitle: 'Hadiah Spesial Level 3',
+    rarity: 'rare',
+    description: 'Pakar infiltrasi grid rahasia dengan kecepatan manuver tinggi.',
+    perkText: '★ HADIAH LIMITED: Terbuka Otomatis Saat Capai Level 3'
+  },
+  {
     id: 'arcade-ghost',
     name: 'Phantom Glitch',
     title: 'Hantu Pemakan Skor',
@@ -374,17 +490,6 @@ export const SHOP_CHARACTERS: ShopCharacter[] = [
     rarity: 'epic',
     description: 'Makhluk glitch digital langka yang mampu menembus tembok matriks data.',
     perkText: '★ HADIAH LIMITED: Terbuka Otomatis Saat Capai Level 6'
-  },
-  {
-    id: 'alien-boss',
-    name: 'Xenon Overlord',
-    title: 'Penguasa Dimensi Luar',
-    icon: '👾',
-    color: 'from-violet-500 to-purple-800',
-    price: 250,
-    rarity: 'epic',
-    description: 'Bos penjaga gerbang arkade dengan kekuatan telekinesis kosmik.',
-    perkText: 'Mahkota hologram ungu raja arkade'
   },
   {
     id: 'cyber-dragon',
@@ -407,12 +512,12 @@ export const SHOP_CHARACTERS: ShopCharacter[] = [
     icon: '🧝‍♀️',
     color: 'from-cyan-400 via-teal-400 to-emerald-500',
     price: 0,
-    minLevel: 15,
+    minLevel: 20,
     isLimitedLevelReward: true,
-    levelRewardTitle: 'Hadiah Mitos Level 15',
+    levelRewardTitle: 'Hadiah Mitos Level 20',
     rarity: 'legendary',
     description: 'Prajurit abadi beroda sayap kuantum dan pedang spektrum pelangi kehormatan.',
-    perkText: '★ HADIAH LIMITED: Terbuka Otomatis Saat Capai Level 15'
+    perkText: '★ HADIAH LIMITED: Terbuka Otomatis Saat Capai Level 20'
   },
   {
     id: 'dark-lord',
@@ -421,26 +526,154 @@ export const SHOP_CHARACTERS: ShopCharacter[] = [
     icon: '👑',
     color: 'from-zinc-800 via-slate-900 to-amber-400',
     price: 0,
-    minLevel: 20,
+    minLevel: 50,
     isLimitedLevelReward: true,
-    levelRewardTitle: 'Hadiah Penguasa Level 20',
+    levelRewardTitle: 'Hadiah Penguasa Level 50',
     rarity: 'legendary',
     description: 'Entitas kecerdasan buatan tertinggi yang menguasai seluruh dunia Nova Arcade.',
-    perkText: '★ HADIAH LIMITED: Terbuka Otomatis Saat Capai Level 20'
+    perkText: '★ HADIAH LIMITED: Terbuka Otomatis Saat Capai Level 50'
+  },
+
+  // --- KELIPATAN 100 LEVEL MILESTONE AVATARS (LIMITED EXCLUSIVE) ---
+  {
+    id: 'infernal-titan',
+    name: 'Infernal Nova Warlord',
+    title: 'Panglima Api Abadi (Kelipatan 100)',
+    icon: '🔥',
+    color: 'from-red-600 via-orange-500 to-yellow-400',
+    price: 0,
+    minLevel: 100,
+    isLimitedLevelReward: true,
+    levelRewardTitle: '🔥 Hadiah Eksklusif Milestone Level 100',
+    rarity: 'legendary',
+    description: 'Panglima penguasa magma inti bintang berapi yang dianugerahkan kepada gamer yang menembus Level 100.',
+    perkText: '★ HADIAH LIMITED KELIPATAN 100: Terbuka Otomatis Saat Capai Level 100'
   },
   {
-    id: 'cosmic-djinn',
-    name: 'Genesis Chrono',
-    title: 'Dewa Ruang & Waktu',
+    id: 'quantum-overlord',
+    name: 'Quantum Singularity Lord',
+    title: 'Penguasa Lubang Hitam (Kelipatan 200)',
     icon: '⚡',
-    color: 'from-yellow-300 via-orange-500 to-purple-600',
+    color: 'from-violet-600 via-indigo-500 to-cyan-400',
     price: 0,
-    minLevel: 30,
+    minLevel: 200,
     isLimitedLevelReward: true,
-    levelRewardTitle: 'Hadiah Supreme Nova Level 30',
+    levelRewardTitle: '⚡ Hadiah Eksklusif Milestone Level 200',
     rarity: 'legendary',
-    description: 'Avatar limited tertinggi tak tertandingi bagi para legenda sejati Nova Arcade.',
-    perkText: '★ HADIAH LIMITED SUPREME: Terbuka Otomatis Saat Capai Level 30'
+    description: 'Mengendalikan gravitasi kuantum dan partikel tak terbatas bagi para veteran Level 200.',
+    perkText: '★ HADIAH LIMITED KELIPATAN 100: Terbuka Otomatis Saat Capai Level 200'
+  },
+  {
+    id: 'celestial-emperor',
+    name: 'Celestial Nebula Emperor',
+    title: 'Kaisar Galaksi Bima Sakti (Kelipatan 300)',
+    icon: '🪐',
+    color: 'from-purple-500 via-pink-500 to-amber-300',
+    price: 0,
+    minLevel: 300,
+    isLimitedLevelReward: true,
+    levelRewardTitle: '🪐 Hadiah Eksklusif Milestone Level 300',
+    rarity: 'legendary',
+    description: 'Kaisar penjaga konstelasi bintang terjauh dengan mahkota debu kosmik Level 300.',
+    perkText: '★ HADIAH LIMITED KELIPATAN 100: Terbuka Otomatis Saat Capai Level 300'
+  },
+  {
+    id: 'cosmic-leviathan',
+    name: 'Cosmic Abyss Leviathan',
+    title: 'Naga Ruang Hampa (Kelipatan 400)',
+    icon: '🐲',
+    color: 'from-emerald-400 via-teal-500 to-blue-600',
+    price: 0,
+    minLevel: 400,
+    isLimitedLevelReward: true,
+    levelRewardTitle: '🐲 Hadiah Eksklusif Milestone Level 400',
+    rarity: 'legendary',
+    description: 'Makhluk kolosal penelan materi gelap yang berenang di samudra antariksa Level 400.',
+    perkText: '★ HADIAH LIMITED KELIPATAN 100: Terbuka Otomatis Saat Capai Level 400'
+  },
+  {
+    id: 'omnipotent-deity',
+    name: 'Omnipotent Matrix Deity',
+    title: 'Dewa Pencipta Realitas (Kelipatan 500)',
+    icon: '✨',
+    color: 'from-yellow-300 via-amber-400 to-rose-500',
+    price: 0,
+    minLevel: 500,
+    isLimitedLevelReward: true,
+    levelRewardTitle: '✨ Hadiah Eksklusif Milestone Level 500',
+    rarity: 'legendary',
+    description: 'Entitas suci tak kasat mata yang mampu menulis ulang kode matriks semesta Level 500.',
+    perkText: '★ HADIAH LIMITED KELIPATAN 100: Terbuka Otomatis Saat Capai Level 500'
+  },
+  {
+    id: 'hyper-genesis',
+    name: 'Hyper Genesis Architect',
+    title: 'Arsitek Multiverse (Kelipatan 600)',
+    icon: '🧬',
+    color: 'from-cyan-300 via-blue-500 to-indigo-700',
+    price: 0,
+    minLevel: 600,
+    isLimitedLevelReward: true,
+    levelRewardTitle: '🧬 Hadiah Eksklusif Milestone Level 600',
+    rarity: 'legendary',
+    description: 'Perancang untaian DNA kosmik dan galaksi baru bagi penguasa Level 600.',
+    perkText: '★ HADIAH LIMITED KELIPATAN 100: Terbuka Otomatis Saat Capai Level 600'
+  },
+  {
+    id: 'astral-dominator',
+    name: 'Astral Supernova Dominator',
+    title: 'Penakluk Ledakan Surya (Kelipatan 700)',
+    icon: '🌠',
+    color: 'from-fuchsia-500 via-rose-500 to-orange-400',
+    price: 0,
+    minLevel: 700,
+    isLimitedLevelReward: true,
+    levelRewardTitle: '🌠 Hadiah Eksklusif Milestone Level 700',
+    rarity: 'legendary',
+    description: 'Menyerap energi ledakan supernova untuk menciptakan senjata plasma Level 700.',
+    perkText: '★ HADIAH LIMITED KELIPATAN 100: Terbuka Otomatis Saat Capai Level 700'
+  },
+  {
+    id: 'void-oracle',
+    name: 'Void Sovereign Oracle',
+    title: 'Peramal Dimensi Kosong (Kelipatan 800)',
+    icon: '🔮',
+    color: 'from-slate-900 via-purple-900 to-cyan-400',
+    price: 0,
+    minLevel: 800,
+    isLimitedLevelReward: true,
+    levelRewardTitle: '🔮 Hadiah Eksklusif Milestone Level 800',
+    rarity: 'legendary',
+    description: 'Melihat masa depan dan masa lalu seluruh arkade dari dalam bola kristal hampa Level 800.',
+    perkText: '★ HADIAH LIMITED KELIPATAN 100: Terbuka Otomatis Saat Capai Level 800'
+  },
+  {
+    id: 'abyssal-titan',
+    name: 'Abyssal Primordial Titan',
+    title: 'Raksasa Awal Mula Waktu (Kelipatan 900)',
+    icon: '🔱',
+    color: 'from-blue-700 via-indigo-900 to-amber-400',
+    price: 0,
+    minLevel: 900,
+    isLimitedLevelReward: true,
+    levelRewardTitle: '🔱 Hadiah Eksklusif Milestone Level 900',
+    rarity: 'legendary',
+    description: 'Pegang trisula gravitasi purba yang telah ada sebelum penciptaan arkade Level 900.',
+    perkText: '★ HADIAH LIMITED KELIPATAN 100: Terbuka Otomatis Saat Capai Level 900'
+  },
+  {
+    id: 'infinite-nova-god',
+    name: 'Infinite Chrono God 1000',
+    title: 'Dewa Tertinggi Nova Arcade (Kelipatan 1000)',
+    icon: '🌟',
+    color: 'from-yellow-200 via-amber-400 to-purple-700',
+    price: 0,
+    minLevel: 1000,
+    isLimitedLevelReward: true,
+    levelRewardTitle: '🌟 HADIAH MAHA MAHKOTA PUNCAK LEVEL 1000',
+    rarity: 'legendary',
+    description: 'Kasta teringgi mutlak para dewa arkade legendaris sepanjang masa di Level 1000.',
+    perkText: '★ HADIAH LIMITED MAHA PUNCAK: Terbuka Otomatis Saat Capai Level 1000'
   }
 ];
 

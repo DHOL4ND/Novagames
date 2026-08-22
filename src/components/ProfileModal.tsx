@@ -245,10 +245,10 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                   <div className="flex items-center gap-2">
                     <Sparkles className="w-4 h-4 text-amber-400 flex-shrink-0 animate-pulse" />
                     <span>
-                      Hadiah Avatar Limited gratis terbuka di <strong>Lv. 3, 6, 10, 15, 20, 30!</strong>
+                      Hadiah Avatar Limited terbuka di <strong>Lv. 3, 6, 10, 20, 50 & setiap Kelipatan 100 (Lv.100 s/d 1000)!</strong>
                     </span>
                   </div>
-                  <span className="font-bold text-amber-300 ml-1">Lv. Anda: {profile.level}</span>
+                  <span className="font-bold text-amber-300 ml-1 whitespace-nowrap">Lv. Anda: {profile.level}</span>
                 </div>
 
                 <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">

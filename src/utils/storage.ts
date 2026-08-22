@@ -13,7 +13,7 @@ export const DEFAULT_PROFILE: PlayerProfile = {
   level: 1,
   totalGamesPlayed: 0,
   unlockedAchievements: [],
-  unlockedAvatars: ['cyber-samurai', 'pixel-wizard'],
+  unlockedAvatars: ['cyber-samurai', 'pixel-wizard', 'retro-gamer'],
   favorites: ['cyber-runner', 'neon-snake'],
   highScores: {
     'cyber-runner': 120,
@@ -34,7 +34,7 @@ export function checkAndUnlockLevelRewards(profile: PlayerProfile): {
 } {
   const currentUnlocked = profile.unlockedAvatars && Array.isArray(profile.unlockedAvatars)
     ? [...profile.unlockedAvatars]
-    : ['cyber-samurai', 'pixel-wizard'];
+    : ['cyber-samurai', 'pixel-wizard', 'retro-gamer'];
 
   const newlyUnlocked: ShopCharacter[] = [];
 
