@@ -527,16 +527,17 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
 
             <div className="space-y-2">
               {[
-                { name: 'Nova Legend', lv: 'Lv. 20+', color: 'from-amber-400 via-pink-500 to-purple-600', badge: '👑 LEGEND', desc: 'Peringkat kasta tertinggi gamer Nova Arcade' },
-                { name: 'Grandmaster', lv: 'Lv. 15 - 19', color: 'from-red-500 to-rose-600', badge: '🔥 GRANDMASTER', desc: 'Pemain elit dengan penguasaan seluruh game' },
-                { name: 'Master', lv: 'Lv. 10 - 14', color: 'from-purple-500 to-indigo-600', badge: '⚡ MASTER', desc: 'Veteran dengan rekor skor dan combo tinggi' },
-                { name: 'Diamond', lv: 'Lv. 7 - 9', color: 'from-cyan-400 to-blue-600', badge: '💎 DIAMOND', desc: 'Pemain mahir dengan konsistensi permainan tinggi' },
-                { name: 'Platinum', lv: 'Lv. 5 - 6', color: 'from-teal-400 to-emerald-600', badge: '🛡️ PLATINUM', desc: 'Pemain reguler yang aktif menuntaskan misi' },
-                { name: 'Gold', lv: 'Lv. 3 - 4', color: 'from-yellow-400 to-amber-600', badge: '⭐ GOLD', desc: 'Mulai menguasai pola rintangan dan manuver' },
-                { name: 'Silver', lv: 'Lv. 2', color: 'from-slate-300 to-slate-500', badge: '⚔️ SILVER', desc: 'Pemain berkembang yang telah memahami dasar game' },
-                { name: 'Bronze', lv: 'Lv. 1', color: 'from-amber-700 to-stone-600', badge: '🌱 BRONZE', desc: 'Tingkat pemula gamer baru' }
+                { name: 'Nova Supreme', lv: 'Lv. 30', color: 'from-yellow-300 via-orange-500 to-purple-600', badge: '⚡ SUPREME', reward: '⚡ Genesis Chrono', desc: 'Kasta tertinggi penguasa dewa arkade' },
+                { name: 'Nova Legend', lv: 'Lv. 20 - 29', color: 'from-amber-400 via-pink-500 to-purple-600', badge: '👑 LEGEND', reward: '👑 Shadow Overclock', desc: 'Peringkat elit kasta tertinggi gamer Nova Arcade' },
+                { name: 'Grandmaster', lv: 'Lv. 15 - 19', color: 'from-red-500 to-rose-600', badge: '🔥 GRANDMASTER', reward: '🧝‍♀️ Cyber Valkyrie', desc: 'Pemain elit dengan penguasaan seluruh game' },
+                { name: 'Master', lv: 'Lv. 10 - 14', color: 'from-purple-500 to-indigo-600', badge: '⚡ MASTER', reward: '🐉 Ryu Matrix Dragon', desc: 'Veteran dengan rekor skor dan combo tinggi' },
+                { name: 'Diamond', lv: 'Lv. 7 - 9', color: 'from-cyan-400 to-blue-600', badge: '💎 DIAMOND', reward: 'Hadiah XP & Koin Berlimpah', desc: 'Pemain mahir dengan konsistensi permainan tinggi' },
+                { name: 'Platinum', lv: 'Lv. 5 - 6', color: 'from-teal-400 to-emerald-600', badge: '🛡️ PLATINUM', reward: '👻 Phantom Glitch (Lv.6)', desc: 'Pemain reguler yang aktif menuntaskan misi' },
+                { name: 'Gold', lv: 'Lv. 3 - 4', color: 'from-yellow-400 to-amber-600', badge: '⭐ GOLD', reward: '🥷 Neon Ninja (Lv.3)', desc: 'Mulai menguasai pola rintangan dan manuver' },
+                { name: 'Silver', lv: 'Lv. 2', color: 'from-slate-300 to-slate-500', badge: '⚔️ SILVER', reward: 'Bonus Koin +50', desc: 'Pemain berkembang yang telah memahami dasar game' },
+                { name: 'Bronze', lv: 'Lv. 1', color: 'from-amber-700 to-stone-600', badge: '🌱 BRONZE', reward: '⚔️ Cyber Samurai & 🧙‍♂️ Pixel Wizard', desc: 'Tingkat starter gamer baru' }
               ].map((t) => {
-                const isCurrent = t.name === tier;
+                const isCurrent = t.name === tier || (tier === 'Nova Legend' && t.name === 'Nova Legend');
                 return (
                   <div
                     key={t.name}
@@ -559,7 +560,11 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
                             </span>
                           )}
                         </div>
-                        <div className="text-[11px] text-slate-400 mt-0.5">{t.desc}</div>
+                        <div className="text-[11px] text-amber-300 font-semibold mt-0.5 flex items-center gap-1">
+                          <span>🎁 Hadiah Avatar:</span>
+                          <strong className="text-white">{t.reward}</strong>
+                        </div>
+                        <div className="text-[10px] text-slate-400">{t.desc}</div>
                       </div>
                     </div>
 

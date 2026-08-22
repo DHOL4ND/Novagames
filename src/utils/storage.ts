@@ -1,5 +1,5 @@
-import { DailyQuest, PlayerProfile } from '../types';
-import { INITIAL_ACHIEVEMENTS, INITIAL_QUESTS } from '../data/games';
+import { DailyQuest, PlayerProfile, ShopCharacter } from '../types';
+import { INITIAL_ACHIEVEMENTS, INITIAL_QUESTS, SHOP_CHARACTERS } from '../data/games';
 import confetti from 'canvas-confetti';
 
 const STORAGE_KEY = 'nova_arcade_player_profile_v1';
@@ -27,12 +27,41 @@ export const DEFAULT_PROFILE: PlayerProfile = {
   }
 };
 
+// Check and automatically unlock level milestone limited rewards
+export function checkAndUnlockLevelRewards(profile: PlayerProfile): {
+  updatedProfile: PlayerProfile;
+  newlyUnlockedAvatars: ShopCharacter[];
+} {
+  const currentUnlocked = profile.unlockedAvatars && Array.isArray(profile.unlockedAvatars)
+    ? [...profile.unlockedAvatars]
+    : ['cyber-samurai', 'pixel-wizard'];
+
+  const newlyUnlocked: ShopCharacter[] = [];
+
+  SHOP_CHARACTERS.forEach(char => {
+    // If it's a limited level reward and player level >= minLevel
+    if (char.isLimitedLevelReward && char.minLevel && profile.level >= char.minLevel) {
+      if (!currentUnlocked.includes(char.id)) {
+        currentUnlocked.push(char.id);
+        newlyUnlocked.push(char);
+      }
+    }
+  });
+
+  const updatedProfile: PlayerProfile = {
+    ...profile,
+    unlockedAvatars: currentUnlocked
+  };
+
+  return { updatedProfile, newlyUnlockedAvatars: newlyUnlocked };
+}
+
 export function loadPlayerProfile(): PlayerProfile {
   try {
     const data = localStorage.getItem(STORAGE_KEY);
     if (data) {
       const parsed = JSON.parse(data);
-      const profile = { ...DEFAULT_PROFILE, ...parsed };
+      let profile: PlayerProfile = { ...DEFAULT_PROFILE, ...parsed };
       if (!profile.unlockedAvatars || !Array.isArray(profile.unlockedAvatars)) {
         profile.unlockedAvatars = ['cyber-samurai', 'pixel-wizard'];
       }
@@ -43,7 +72,10 @@ export function loadPlayerProfile(): PlayerProfile {
       if (typeof profile.coins !== 'number' || profile.coins < 100) {
         profile.coins = Math.max(100, Number(profile.coins) || 100);
       }
-      return profile;
+
+      // Check if any level milestone avatar qualifies
+      const { updatedProfile } = checkAndUnlockLevelRewards(profile);
+      return updatedProfile;
     }
   } catch {}
   return DEFAULT_PROFILE;
@@ -81,13 +113,19 @@ export function fireCelebrationConfetti() {
   } catch {}
 }
 
-// Calculate level and check achievements after any game score update
+// Calculate level, rewards, and check achievements after any game score update
 export function updateGameResults(
   profile: PlayerProfile,
   gameId: string,
   score: number,
   coinsEarned: number = 10
-): { updatedProfile: PlayerProfile; newAchievements: string[]; newHighscore: boolean } {
+): {
+  updatedProfile: PlayerProfile;
+  newAchievements: string[];
+  newHighscore: boolean;
+  newlyUnlockedAvatars: ShopCharacter[];
+  didLevelUp: boolean;
+} {
   const currentHigh = profile.highScores[gameId] || 0;
   const isHigh = score > currentHigh;
   const newHighScores = {
@@ -99,6 +137,7 @@ export function updateGameResults(
   const newCoins = profile.coins + coinsEarned;
   const newXp = profile.xp + Math.max(10, Math.floor(score / 5));
   const newLevel = Math.floor(newXp / 200) + 1;
+  const didLevelUp = newLevel > profile.level;
 
   const unlocked = [...profile.unlockedAchievements];
   const newAch: string[] = [];
@@ -118,7 +157,7 @@ export function updateGameResults(
     }
   });
 
-  const updated: PlayerProfile = {
+  const baseUpdated: PlayerProfile = {
     ...profile,
     highScores: newHighScores,
     totalGamesPlayed: newTotalGames,
@@ -128,6 +167,15 @@ export function updateGameResults(
     unlockedAchievements: unlocked
   };
 
-  savePlayerProfile(updated);
-  return { updatedProfile: updated, newAchievements: newAch, newHighscore: isHigh };
+  // Check limited level milestone unlocks
+  const { updatedProfile, newlyUnlockedAvatars } = checkAndUnlockLevelRewards(baseUpdated);
+
+  savePlayerProfile(updatedProfile);
+  return {
+    updatedProfile,
+    newAchievements: newAch,
+    newHighscore: isHigh,
+    newlyUnlockedAvatars,
+    didLevelUp
+  };
 }

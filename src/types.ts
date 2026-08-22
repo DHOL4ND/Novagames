@@ -28,6 +28,8 @@ export interface ShopCharacter {
   color: string;
   price: number;
   minLevel?: number;
+  isLimitedLevelReward?: boolean;
+  levelRewardTitle?: string;
   rarity: 'common' | 'rare' | 'epic' | 'legendary';
   description: string;
   perkText: string;

@@ -221,7 +221,10 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
               {/* Avatar Selector with Shop Link */}
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <label className="text-xs font-semibold text-slate-300">Pilih Avatar Aktif:</label>
+                  <div className="flex items-center gap-1.5">
+                    <label className="text-xs font-semibold text-slate-300">Pilih Avatar Aktif:</label>
+                    <span className="text-[10px] text-amber-400 font-mono font-bold">({unlockedAvatars.length}/{SHOP_CHARACTERS.length})</span>
+                  </div>
                   {onOpenShop && (
                     <button
                       onClick={() => {
@@ -232,15 +235,27 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                       className="text-xs text-amber-400 hover:text-amber-300 font-semibold flex items-center gap-1 cursor-pointer"
                     >
                       <ShoppingBag className="w-3.5 h-3.5" />
-                      <span>Beli Avatar di Toko</span>
+                      <span>Beli / Cek Toko</span>
                     </button>
                   )}
                 </div>
 
-                <div className="grid grid-cols-4 gap-2.5">
+                {/* Level Reward Milestone Info Hint */}
+                <div className="p-2.5 mb-2.5 rounded-xl bg-gradient-to-r from-amber-500/10 via-yellow-500/10 to-amber-500/10 border border-amber-500/30 text-[11px] text-amber-200 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-amber-400 flex-shrink-0 animate-pulse" />
+                    <span>
+                      Hadiah Avatar Limited gratis terbuka di <strong>Lv. 3, 6, 10, 15, 20, 30!</strong>
+                    </span>
+                  </div>
+                  <span className="font-bold text-amber-300 ml-1">Lv. Anda: {profile.level}</span>
+                </div>
+
+                <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
                   {SHOP_CHARACTERS.map((char) => {
                     const isUnlocked = unlockedAvatars.includes(char.id);
                     const isSelected = selectedAvatar === char.id;
+                    const isLimited = !!char.isLimitedLevelReward;
 
                     return (
                       <button
@@ -253,22 +268,44 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                             onUpdateProfile({ ...profile, avatar: char.id });
                           }
                         }}
-                        className={`relative p-3 rounded-2xl border flex flex-col items-center gap-1.5 transition-all ${
+                        className={`relative p-2 rounded-xl border flex flex-col items-center gap-1 transition-all ${
                           !isUnlocked
-                            ? 'bg-slate-900/20 border-slate-800/60 opacity-50 cursor-not-allowed'
+                            ? isLimited
+                              ? 'bg-slate-900/30 border-amber-500/30 opacity-70 cursor-not-allowed'
+                              : 'bg-slate-900/20 border-slate-800/60 opacity-50 cursor-not-allowed'
                             : isSelected
-                            ? 'bg-indigo-500/20 border-indigo-400 shadow-md shadow-indigo-500/20 scale-105 cursor-pointer'
+                            ? 'bg-indigo-500/20 border-indigo-400 shadow-md shadow-indigo-500/20 scale-105 cursor-pointer ring-1 ring-indigo-400'
                             : 'bg-slate-900/40 border-slate-800 hover:border-slate-700 cursor-pointer'
                         }`}
+                        title={
+                          isUnlocked
+                            ? `Pilih ${char.name}`
+                            : isLimited
+                            ? `${char.name} (Hadiah Terkunci: Butuh Level ${char.minLevel})`
+                            : `${char.name} (Beli di toko: ${char.price} Koin)`
+                        }
                       >
                         <span className="text-2xl">{char.icon}</span>
-                        <span className="text-[10px] font-semibold text-slate-300 truncate w-full text-center">
+                        <span className="text-[9px] font-semibold text-slate-300 truncate w-full text-center leading-tight">
                           {char.name}
                         </span>
 
                         {!isUnlocked && (
-                          <div className="absolute top-1.5 right-1.5 text-[10px] text-amber-400">
-                            <Lock className="w-3 h-3" />
+                          <div className="absolute top-1 right-1 flex items-center">
+                            {isLimited ? (
+                              <span className="text-[8px] font-mono font-black px-1 rounded bg-amber-500 text-slate-950 shadow-sm">
+                                Lv.{char.minLevel}
+                              </span>
+                            ) : (
+                              <div className="text-amber-400">
+                                <Lock className="w-2.5 h-2.5" />
+                              </div>
+                            )}
+                          </div>
+                        )}
+                        {isSelected && (
+                          <div className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-emerald-500 text-slate-950 flex items-center justify-center shadow-sm">
+                            <Check className="w-2.5 h-2.5" />
                           </div>
                         )}
                       </button>

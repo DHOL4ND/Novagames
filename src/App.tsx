@@ -7,6 +7,7 @@ import {
   loadQuests,
   saveQuests,
   updateGameResults,
+  checkAndUnlockLevelRewards,
   fireCelebrationConfetti
 } from './utils/storage';
 import { getSortedLevelLeaderboard } from './data/leaderboardData';
@@ -137,7 +138,7 @@ export default function App() {
   };
 
   const handleGameOver = (gameId: string, score: number, coins: number) => {
-    const { updatedProfile, newAchievements, newHighscore } = updateGameResults(
+    const { updatedProfile, newAchievements, newHighscore, newlyUnlockedAvatars, didLevelUp } = updateGameResults(
       profile,
       gameId,
       score,
@@ -161,6 +162,31 @@ export default function App() {
     });
     setQuests(updatedQuests);
 
+    // If new limited avatars unlocked by level!
+    if (newlyUnlockedAvatars.length > 0) {
+      sound.playPowerup();
+      fireCelebrationConfetti();
+      const first = newlyUnlockedAvatars[0];
+      setToastMessage({
+        title: '🎉 AVATAR LIMITED TERBUKA!',
+        desc: `Level ${updatedProfile.level} tercapai! Kamu membuka hadiah eksklusif "${first.name}" ${first.icon}`,
+        icon: first.icon
+      });
+      return;
+    }
+
+    // If level up
+    if (didLevelUp) {
+      sound.playPowerup();
+      fireCelebrationConfetti();
+      setToastMessage({
+        title: 'NAIK LEVEL! ⚡',
+        desc: `Selamat! Kamu naik ke Level ${updatedProfile.level}! Cek Toko/Profil untuk avatar limited baru!`,
+        icon: '⭐'
+      });
+      return;
+    }
+
     // Notify if highscore
     if (newHighscore && score > 0) {
       fireCelebrationConfetti();
@@ -169,6 +195,7 @@ export default function App() {
         desc: `Kamu mencetak skor tertinggi baru: ${score} poin!`,
         icon: '👑'
       });
+      return;
     }
 
     // Notify if achievement unlocked
@@ -189,19 +216,33 @@ export default function App() {
     const updatedQuests = quests.map(q => (q.id === questId ? { ...q, claimed: true } : q));
     setQuests(updatedQuests);
 
-    const updatedProfile = {
+    const baseUpdated = {
       ...profile,
       coins: profile.coins + target.rewardCoins,
       xp: profile.xp + target.rewardXp,
       level: Math.floor((profile.xp + target.rewardXp) / 200) + 1
     };
+
+    const { updatedProfile, newlyUnlockedAvatars } = checkAndUnlockLevelRewards(baseUpdated);
     setProfile(updatedProfile);
 
-    setToastMessage({
-      title: 'HADIAH MISI DIKLAIM! 🪙',
-      desc: `+${target.rewardCoins} Koin & +${target.rewardXp} XP telah ditambahkan!`,
-      icon: '🎁'
-    });
+    if (newlyUnlockedAvatars.length > 0) {
+      sound.playPowerup();
+      fireCelebrationConfetti();
+      const first = newlyUnlockedAvatars[0];
+      setToastMessage({
+        title: '🎉 AVATAR LIMITED TERBUKA!',
+        desc: `Level ${updatedProfile.level} tercapai! Hadiah eksklusif "${first.name}" ${first.icon} siap digunakan!`,
+        icon: first.icon
+      });
+    } else {
+      sound.playPowerup();
+      setToastMessage({
+        title: 'HADIAH MISI DIKLAIM! 🪙',
+        desc: `+${target.rewardCoins} Koin & +${target.rewardXp} XP telah ditambahkan!`,
+        icon: '🎁'
+      });
+    }
   };
 
   // Filtered Games

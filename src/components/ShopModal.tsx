@@ -3,7 +3,7 @@ import { PlayerProfile, ShopCharacter } from '../types';
 import { SHOP_CHARACTERS } from '../data/games';
 import { sound } from '../utils/audio';
 import { fireCelebrationConfetti } from '../utils/storage';
-import { Check, Coins, Gift, ShoppingBag, Sparkles, User, X, Zap } from 'lucide-react';
+import { Check, Coins, Crown, Gift, Lock, ShoppingBag, Sparkles, Star, Trophy, User, X, Zap } from 'lucide-react';
 
 interface ShopModalProps {
   profile: PlayerProfile;
@@ -18,7 +18,7 @@ export const ShopModal: React.FC<ShopModalProps> = ({
   onUpdateProfile,
   onNotify
 }) => {
-  const [filterRarity, setFilterRarity] = useState<'all' | 'rare' | 'epic' | 'legendary'>('all');
+  const [filterRarity, setFilterRarity] = useState<'all' | 'limited' | 'rare' | 'epic' | 'legendary'>('all');
   const [selectedChar, setSelectedChar] = useState<ShopCharacter>(() => {
     return SHOP_CHARACTERS.find(c => c.id === profile.avatar) || SHOP_CHARACTERS[0];
   });
@@ -29,6 +29,7 @@ export const ShopModal: React.FC<ShopModalProps> = ({
 
   const filteredCharacters = SHOP_CHARACTERS.filter(char => {
     if (filterRarity === 'all') return true;
+    if (filterRarity === 'limited') return char.isLimitedLevelReward;
     return char.rarity === filterRarity;
   });
 
@@ -54,12 +55,25 @@ export const ShopModal: React.FC<ShopModalProps> = ({
       return;
     }
 
+    // If it's a limited level reward
+    if (char.isLimitedLevelReward && char.minLevel) {
+      if (profile.level < char.minLevel) {
+        sound.playGameOver();
+        onNotify(
+          'Avatar Limited Terkunci!',
+          `Avatar "${char.name}" merupakan hadiah eksklusif yang hanya bisa didapatkan saat kamu mencapai Level ${char.minLevel}! Tingkatkan levelmu dengan memainkan mini game!`,
+          '🔒'
+        );
+        return;
+      }
+    }
+
     // Check if affordable
     if (profile.coins < char.price) {
       sound.playGameOver();
       onNotify(
         'Koin Belum Cukup!',
-        `Kamu punya ${profile.coins} koin, butuh ${char.price} koin. Klik tombol "Klaim Bonus Koin" di atas untuk dapat 100 koin gratis!`,
+        `Kamu punya ${profile.coins} koin, butuh ${char.price} koin. Klik tombol "+100 Koin Gratis" di atas untuk dapat koin gratis!`,
         '🪙'
       );
       return;
@@ -96,8 +110,16 @@ export const ShopModal: React.FC<ShopModalProps> = ({
     onNotify('Avatar Terpasang!', `${char.name} kini menjadi avatar aktifmu.`, char.icon);
   };
 
-  const getRarityBadge = (rarity: ShopCharacter['rarity']) => {
-    switch (rarity) {
+  const getRarityBadge = (char: ShopCharacter) => {
+    if (char.isLimitedLevelReward) {
+      return (
+        <span className="text-[9px] font-extrabold px-2 py-0.5 rounded-full bg-gradient-to-r from-amber-500/30 via-yellow-400/30 to-amber-500/30 text-amber-300 border border-amber-400/60 shadow-sm flex items-center gap-1 animate-pulse">
+          <Crown className="w-2.5 h-2.5 text-amber-400" />
+          LIMITED LV.{char.minLevel}
+        </span>
+      );
+    }
+    switch (char.rarity) {
       case 'legendary':
         return (
           <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40">
@@ -127,6 +149,8 @@ export const ShopModal: React.FC<ShopModalProps> = ({
 
   const isSelectedUnlocked = unlockedList.includes(selectedChar.id);
   const isSelectedEquipped = profile.avatar === selectedChar.id;
+  const isSelectedLimited = !!selectedChar.isLimitedLevelReward;
+  const isSelectedLevelLocked = isSelectedLimited && selectedChar.minLevel ? profile.level < selectedChar.minLevel : false;
   const canAffordSelected = profile.coins >= selectedChar.price;
 
   return (
@@ -140,12 +164,12 @@ export const ShopModal: React.FC<ShopModalProps> = ({
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="text-base sm:text-lg font-bold text-white">Toko Karakter Cyber</h3>
+                <h3 className="text-base sm:text-lg font-bold text-white">Toko Karakter & Avatar Limited</h3>
                 <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-gradient-to-r from-amber-500/20 to-yellow-500/20 text-amber-300 border border-amber-500/30">
-                  SHOP
+                  SHOP & REWARDS
                 </span>
               </div>
-              <p className="text-[11px] text-slate-400">Beli karakter & pasang avatar favoritmu untuk bermain di arena arkade</p>
+              <p className="text-[11px] text-slate-400">Koleksi avatar toko koin dan hadiah avatar limited eksklusif saat naik level</p>
             </div>
           </div>
 
@@ -183,20 +207,32 @@ export const ShopModal: React.FC<ShopModalProps> = ({
         {/* Filter Rarity Chips & Counter */}
         <div className="flex items-center justify-between gap-2 my-3">
           <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
-            {(['all', 'rare', 'epic', 'legendary'] as const).map((r) => (
+            {(
+              [
+                { id: 'all', label: 'Semua Karakter' },
+                { id: 'limited', label: '⭐ Hadiah Level (Limited)' },
+                { id: 'rare', label: 'Rare' },
+                { id: 'epic', label: 'Epic' },
+                { id: 'legendary', label: 'Legendary' }
+              ] as const
+            ).map((item) => (
               <button
-                key={r}
+                key={item.id}
                 onClick={() => {
                   sound.playClick();
-                  setFilterRarity(r);
+                  setFilterRarity(item.id);
                 }}
-                className={`px-3 py-1 rounded-full text-xs font-semibold capitalize transition-all cursor-pointer whitespace-nowrap ${
-                  filterRarity === r
-                    ? 'bg-amber-500 text-slate-950 font-bold shadow-md shadow-amber-500/20'
+                className={`px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer whitespace-nowrap ${
+                  filterRarity === item.id
+                    ? item.id === 'limited'
+                      ? 'bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 font-black shadow-md shadow-amber-500/30'
+                      : 'bg-indigo-600 text-white font-bold shadow-md shadow-indigo-600/20'
+                    : item.id === 'limited'
+                    ? 'bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/40'
                     : 'bg-slate-900/60 hover:bg-slate-800 text-slate-400 hover:text-slate-200 border border-slate-800/60'
                 }`}
               >
-                {r === 'all' ? 'Semua Karakter' : r}
+                {item.label}
               </button>
             ))}
           </div>
@@ -214,6 +250,8 @@ export const ShopModal: React.FC<ShopModalProps> = ({
               const isUnlocked = unlockedList.includes(char.id);
               const isEquipped = profile.avatar === char.id;
               const isSelected = selectedChar.id === char.id;
+              const isLimited = !!char.isLimitedLevelReward;
+              const isLevelLocked = isLimited && char.minLevel ? profile.level < char.minLevel : false;
               const canAfford = profile.coins >= char.price;
 
               return (
@@ -227,18 +265,24 @@ export const ShopModal: React.FC<ShopModalProps> = ({
                   className={`relative p-3 rounded-2xl border text-left flex flex-col justify-between transition-all cursor-pointer group ${
                     isSelected
                       ? 'bg-slate-800/90 border-amber-500 shadow-lg shadow-amber-500/20 ring-1 ring-amber-500/50'
+                      : isLimited && !isUnlocked
+                      ? 'bg-slate-900/60 hover:bg-slate-900/90 border-amber-500/30 hover:border-amber-500/60'
                       : 'bg-slate-900/50 hover:bg-slate-900/90 border-slate-800/80 hover:border-slate-700'
                   }`}
                 >
                   {/* Top Bar on Card */}
                   <div className="flex items-center justify-between w-full mb-1.5">
-                    {getRarityBadge(char.rarity)}
+                    {getRarityBadge(char)}
                     {isEquipped ? (
                       <span className="px-1.5 py-0.5 rounded-full bg-emerald-500 text-slate-950 text-[9px] font-bold">
                         Aktif
                       </span>
                     ) : isUnlocked ? (
                       <span className="text-[10px] text-emerald-400 font-semibold">Milik</span>
+                    ) : isLimited ? (
+                      <span className="flex items-center gap-0.5 text-[10px] font-mono text-amber-400 font-extrabold">
+                        <Lock className="w-2.5 h-2.5 text-amber-400" /> Lv.{char.minLevel}
+                      </span>
                     ) : (
                       <span className="flex items-center gap-0.5 text-[11px] font-mono text-amber-400 font-bold">
                         🪙 {char.price}
@@ -247,16 +291,27 @@ export const ShopModal: React.FC<ShopModalProps> = ({
                   </div>
 
                   {/* Character Avatar Banner */}
-                  <div className={`w-full h-16 rounded-xl bg-gradient-to-br ${char.color} flex items-center justify-center text-3xl shadow-inner relative overflow-hidden my-1 border border-white/10`}>
+                  <div className={`w-full h-16 rounded-xl bg-gradient-to-br ${char.color} flex items-center justify-center text-3xl shadow-inner relative overflow-hidden my-1 border border-white/10 ${!isUnlocked && isLimited ? 'filter saturate-75' : ''}`}>
                     <span className="transform group-hover:scale-115 transition-transform duration-200">
                       {char.icon}
                     </span>
+                    {!isUnlocked && isLimited && (
+                      <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                        <div className="w-7 h-7 rounded-full bg-slate-950/80 border border-amber-400/60 flex items-center justify-center text-amber-400 shadow-md">
+                          <Lock className="w-3.5 h-3.5" />
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   {/* Name & Title */}
                   <div className="my-1">
-                    <div className="text-xs font-bold text-white truncate">{char.name}</div>
-                    <div className="text-[10px] text-slate-400 truncate">{char.title}</div>
+                    <div className="text-xs font-bold text-white truncate flex items-center gap-1">
+                      <span>{char.name}</span>
+                    </div>
+                    <div className="text-[10px] text-slate-400 truncate">
+                      {isLimited ? `Hadiah Capai Level ${char.minLevel}` : char.title}
+                    </div>
                   </div>
 
                   {/* Direct Action Button on each card */}
@@ -275,6 +330,22 @@ export const ShopModal: React.FC<ShopModalProps> = ({
                         className="w-full py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-[11px] font-bold flex items-center justify-center gap-1 cursor-pointer transition-all shadow-sm"
                       >
                         <User className="w-3 h-3" /> Gunakan
+                      </button>
+                    ) : isLimited ? (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedChar(char);
+                          sound.playClick();
+                        }}
+                        className={`w-full py-1.5 rounded-xl text-[10px] font-bold flex items-center justify-center gap-1 transition-all ${
+                          isLevelLocked
+                            ? 'bg-slate-800 text-amber-300/80 border border-amber-500/30'
+                            : 'bg-amber-500 text-slate-950 font-black'
+                        }`}
+                      >
+                        <Lock className="w-2.5 h-2.5" />
+                        <span>{isLevelLocked ? `Butuh Level ${char.minLevel}` : 'Klaim Hadiah'}</span>
                       </button>
                     ) : (
                       <button
@@ -306,20 +377,58 @@ export const ShopModal: React.FC<ShopModalProps> = ({
                   {selectedChar.icon}
                 </span>
                 <div className="relative z-10 flex items-center gap-1.5">
-                  {getRarityBadge(selectedChar.rarity)}
+                  {getRarityBadge(selectedChar)}
                 </div>
               </div>
 
               {/* Character Details */}
               <div className="space-y-2">
                 <div>
-                  <h4 className="text-lg font-extrabold text-white tracking-tight">{selectedChar.name}</h4>
+                  <h4 className="text-lg font-extrabold text-white tracking-tight flex items-center gap-2">
+                    <span>{selectedChar.name}</span>
+                    {isSelectedLimited && (
+                      <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/40">
+                        LIMITED REWARD
+                      </span>
+                    )}
+                  </h4>
                   <p className="text-xs text-indigo-400 font-semibold">{selectedChar.title}</p>
                 </div>
 
                 <p className="text-xs text-slate-300 leading-relaxed bg-slate-950/80 p-2.5 rounded-xl border border-slate-800/70">
                   {selectedChar.description}
                 </p>
+
+                {/* Limited Milestone Level Requirement Progress Box */}
+                {isSelectedLimited && selectedChar.minLevel && (
+                  <div className="bg-gradient-to-br from-amber-500/10 to-yellow-500/10 border border-amber-500/40 p-3 rounded-xl space-y-2">
+                    <div className="flex items-center justify-between text-xs font-bold">
+                      <span className="text-amber-300 flex items-center gap-1.5">
+                        <Trophy className="w-4 h-4 text-amber-400" />
+                        Syarat Hadiah Level:
+                      </span>
+                      <span className="font-mono text-white">
+                        Level {profile.level} / <strong className="text-amber-400">Level {selectedChar.minLevel}</strong>
+                      </span>
+                    </div>
+
+                    {/* Progress Bar */}
+                    <div className="w-full h-2.5 bg-slate-950 rounded-full overflow-hidden border border-amber-500/30">
+                      <div
+                        className="h-full bg-gradient-to-r from-amber-500 to-yellow-400 transition-all duration-500 rounded-full"
+                        style={{
+                          width: `${Math.min(100, Math.round((profile.level / selectedChar.minLevel) * 100))}%`
+                        }}
+                      />
+                    </div>
+
+                    <p className="text-[11px] text-slate-300 leading-snug">
+                      {profile.level >= selectedChar.minLevel
+                        ? '🎉 Syarat level terpenuhi! Avatar ini sudah menjadi milikmu secara permanen!'
+                        : `Mainkan mini game & kumpulkan XP untuk naik ke Level ${selectedChar.minLevel}. Avatar akan terbuka otomatis secara gratis!`}
+                    </p>
+                  </div>
+                )}
 
                 <div className="flex items-center gap-2 text-xs text-amber-300 bg-amber-500/10 border border-amber-500/30 p-2.5 rounded-xl">
                   <Zap className="w-4 h-4 text-amber-400 flex-shrink-0" />
@@ -331,9 +440,13 @@ export const ShopModal: React.FC<ShopModalProps> = ({
             {/* Bottom Actions on Inspector */}
             <div className="mt-4 pt-3 border-t border-slate-800/70 space-y-2.5">
               <div className="flex items-center justify-between text-xs bg-slate-950/60 px-3 py-2 rounded-xl border border-slate-800/50">
-                <span className="text-slate-400">Harga Karakter:</span>
+                <span className="text-slate-400">Status / Harga:</span>
                 <span className="text-base font-mono font-extrabold text-amber-400 flex items-center gap-1">
-                  {selectedChar.price === 0 ? 'GRATIS' : `${selectedChar.price} 🪙`}
+                  {isSelectedLimited
+                    ? `HADIAH LEVEL ${selectedChar.minLevel}`
+                    : selectedChar.price === 0
+                    ? 'GRATIS'
+                    : `${selectedChar.price} 🪙`}
                 </span>
               </div>
 
@@ -351,6 +464,16 @@ export const ShopModal: React.FC<ShopModalProps> = ({
                   className="w-full py-3 rounded-full bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold shadow-lg shadow-indigo-500/30 flex items-center justify-center gap-2 cursor-pointer transition-all transform hover:scale-[1.02] active:scale-98"
                 >
                   <User className="w-4 h-4" /> Pasang Sebagai Avatar Aktif
+                </button>
+              ) : isSelectedLimited ? (
+                <button
+                  disabled
+                  className="w-full py-3 rounded-full bg-slate-800/90 border border-amber-500/40 text-amber-300/90 text-xs font-bold flex items-center justify-center gap-2 cursor-not-allowed"
+                >
+                  <Lock className="w-4 h-4 text-amber-400" />
+                  {isSelectedLevelLocked
+                    ? `Terkunci: Capai Level ${selectedChar.minLevel} (Anda Lv. ${profile.level})`
+                    : 'Terbuka saat naik level'}
                 </button>
               ) : (
                 <button
@@ -376,7 +499,7 @@ export const ShopModal: React.FC<ShopModalProps> = ({
         <div className="pt-3 border-t border-slate-800/60 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-400 mt-2 gap-2">
           <div className="flex items-center gap-1.5 text-[11px]">
             <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-            <span>Karakter yang dibeli otomatis menjadi avatar resmi di game & profil kamu!</span>
+            <span>Karakter yang terbuka & dibeli otomatis menjadi avatar resmi di game & profil kamu!</span>
           </div>
           <div className="flex items-center gap-2">
             <span className="font-mono text-amber-400 font-bold">Dompet: {profile.coins} 🪙</span>
@@ -386,3 +509,4 @@ export const ShopModal: React.FC<ShopModalProps> = ({
     </div>
   );
 };
+

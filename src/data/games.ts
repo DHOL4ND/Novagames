@@ -254,9 +254,10 @@ export const SHOP_CHARACTERS: ShopCharacter[] = [
     icon: '⚔️',
     color: 'from-cyan-500 to-blue-600',
     price: 0,
+    minLevel: 1,
     rarity: 'common',
     description: 'Karakter starter standar bersenjata katana energi laser.',
-    perkText: 'Karakter Dasar Gratis'
+    perkText: 'Karakter Starter Gratis'
   },
   {
     id: 'pixel-wizard',
@@ -265,9 +266,10 @@ export const SHOP_CHARACTERS: ShopCharacter[] = [
     icon: '🧙‍♂️',
     color: 'from-purple-500 to-pink-600',
     price: 0,
+    minLevel: 1,
     rarity: 'common',
     description: 'Menguasai sihir partikel 8-bit kuno dari era arcade 1980-an.',
-    perkText: 'Karakter Dasar Gratis'
+    perkText: 'Karakter Starter Gratis'
   },
   {
     id: 'neon-ninja',
@@ -275,10 +277,13 @@ export const SHOP_CHARACTERS: ShopCharacter[] = [
     title: 'Bayangan Berkecepatan Cahaya',
     icon: '🥷',
     color: 'from-emerald-500 to-teal-600',
-    price: 50,
+    price: 0,
+    minLevel: 3,
+    isLimitedLevelReward: true,
+    levelRewardTitle: 'Hadiah Spesial Level 3',
     rarity: 'rare',
     description: 'Pakar infiltrasi grid rahasia dengan kecepatan manuver tinggi.',
-    perkText: 'Gaya visual hijau neon stealth'
+    perkText: '★ HADIAH LIMITED: Terbuka Otomatis Saat Capai Level 3'
   },
   {
     id: 'mecha-robot',
@@ -319,10 +324,13 @@ export const SHOP_CHARACTERS: ShopCharacter[] = [
     title: 'Hantu Pemakan Skor',
     icon: '👻',
     color: 'from-yellow-400 to-amber-600',
-    price: 200,
+    price: 0,
+    minLevel: 6,
+    isLimitedLevelReward: true,
+    levelRewardTitle: 'Hadiah Spesial Level 6',
     rarity: 'epic',
-    description: 'Makhluk glitch digital yang mampu menembus tembok matriks data.',
-    perkText: 'Gaya transparan glitch unik'
+    description: 'Makhluk glitch digital langka yang mampu menembus tembok matriks data.',
+    perkText: '★ HADIAH LIMITED: Terbuka Otomatis Saat Capai Level 6'
   },
   {
     id: 'alien-boss',
@@ -341,10 +349,13 @@ export const SHOP_CHARACTERS: ShopCharacter[] = [
     title: 'Naga Purba Cybernetic',
     icon: '🐉',
     color: 'from-red-500 via-amber-500 to-yellow-400',
-    price: 350,
+    price: 0,
+    minLevel: 10,
+    isLimitedLevelReward: true,
+    levelRewardTitle: 'Hadiah Legendaris Level 10',
     rarity: 'epic',
-    description: 'Naga legendaris pemuntah laser berkekuatan mega-gigawatt.',
-    perkText: 'Aura api naga emas membara'
+    description: 'Naga purba pemuntah laser berkekuatan mega-gigawatt khusus master arkade.',
+    perkText: '★ HADIAH LIMITED: Terbuka Otomatis Saat Capai Level 10'
   },
   {
     id: 'super-valkyrie',
@@ -352,10 +363,13 @@ export const SHOP_CHARACTERS: ShopCharacter[] = [
     title: 'Pelindung Singgasana Cyber',
     icon: '🧝‍♀️',
     color: 'from-cyan-400 via-teal-400 to-emerald-500',
-    price: 450,
+    price: 0,
+    minLevel: 15,
+    isLimitedLevelReward: true,
+    levelRewardTitle: 'Hadiah Mitos Level 15',
     rarity: 'legendary',
-    description: 'Prajurit abadi beroda sayap kuantum dan pedang spektrum pelangi.',
-    perkText: 'Efek kilau cyan murni'
+    description: 'Prajurit abadi beroda sayap kuantum dan pedang spektrum pelangi kehormatan.',
+    perkText: '★ HADIAH LIMITED: Terbuka Otomatis Saat Capai Level 15'
   },
   {
     id: 'dark-lord',
@@ -363,10 +377,13 @@ export const SHOP_CHARACTERS: ShopCharacter[] = [
     title: 'Hacker Gelap Super-AI',
     icon: '👑',
     color: 'from-zinc-800 via-slate-900 to-amber-400',
-    price: 600,
+    price: 0,
+    minLevel: 20,
+    isLimitedLevelReward: true,
+    levelRewardTitle: 'Hadiah Penguasa Level 20',
     rarity: 'legendary',
     description: 'Entitas kecerdasan buatan tertinggi yang menguasai seluruh dunia Nova Arcade.',
-    perkText: 'Gelar Eksklusif Penguasa Nova'
+    perkText: '★ HADIAH LIMITED: Terbuka Otomatis Saat Capai Level 20'
   },
   {
     id: 'cosmic-djinn',
@@ -374,10 +391,13 @@ export const SHOP_CHARACTERS: ShopCharacter[] = [
     title: 'Dewa Ruang & Waktu',
     icon: '⚡',
     color: 'from-yellow-300 via-orange-500 to-purple-600',
-    price: 800,
+    price: 0,
+    minLevel: 30,
+    isLimitedLevelReward: true,
+    levelRewardTitle: 'Hadiah Supreme Nova Level 30',
     rarity: 'legendary',
-    description: 'Karakter paling langka pembawa takdir rekor tertinggi antargalaksi.',
-    perkText: 'Efek kilat abadi & Penguasa Skor'
+    description: 'Avatar limited tertinggi tak tertandingi bagi para legenda sejati Nova Arcade.',
+    perkText: '★ HADIAH LIMITED SUPREME: Terbuka Otomatis Saat Capai Level 30'
   }
 ];
 
