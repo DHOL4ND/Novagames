@@ -1,4 +1,4 @@
-import { Achievement, DailyQuest, GameMetadata } from '../types';
+import { Achievement, DailyQuest, GameMetadata, ShopCharacter } from '../types';
 
 export const GAMES_DATA: GameMetadata[] = [
   {
@@ -246,13 +246,151 @@ export const INITIAL_QUESTS: DailyQuest[] = [
   }
 ];
 
-export const AVATAR_LIST = [
-  { id: 'cyber-samurai', label: 'Cyber Samurai', icon: '⚔️', color: 'from-cyan-500 to-blue-600' },
-  { id: 'pixel-wizard', label: 'Pixel Wizard', icon: '🧙‍♂️', color: 'from-purple-500 to-pink-600' },
-  { id: 'neon-ninja', label: 'Neon Ninja', icon: '🥷', color: 'from-emerald-500 to-teal-600' },
-  { id: 'mecha-robot', label: 'Mecha Bot', icon: '🤖', color: 'from-amber-500 to-orange-600' },
-  { id: 'space-pilot', label: 'Astro Pilot', icon: '👨‍🚀', color: 'from-blue-500 to-indigo-600' },
-  { id: 'cyber-cat', label: 'Cyber Cat', icon: '🐱', color: 'from-rose-500 to-fuchsia-600' },
-  { id: 'arcade-ghost', label: 'Arcade Ghost', icon: '👻', color: 'from-yellow-400 to-amber-600' },
-  { id: 'alien-boss', label: 'Alien Legend', icon: '👾', color: 'from-violet-500 to-purple-800' }
+export const SHOP_CHARACTERS: ShopCharacter[] = [
+  {
+    id: 'cyber-samurai',
+    name: 'Cyber Samurai',
+    title: 'Pendekar Pedang Neon',
+    icon: '⚔️',
+    color: 'from-cyan-500 to-blue-600',
+    price: 0,
+    rarity: 'common',
+    description: 'Karakter starter standar bersenjata katana energi laser.',
+    perkText: 'Karakter Dasar Gratis'
+  },
+  {
+    id: 'pixel-wizard',
+    name: 'Pixel Wizard',
+    title: 'Penyihir Dimensi Retro',
+    icon: '🧙‍♂️',
+    color: 'from-purple-500 to-pink-600',
+    price: 0,
+    rarity: 'common',
+    description: 'Menguasai sihir partikel 8-bit kuno dari era arcade 1980-an.',
+    perkText: 'Karakter Dasar Gratis'
+  },
+  {
+    id: 'neon-ninja',
+    name: 'Neon Ninja',
+    title: 'Bayangan Berkecepatan Cahaya',
+    icon: '🥷',
+    color: 'from-emerald-500 to-teal-600',
+    price: 80,
+    rarity: 'rare',
+    description: 'Pakar infiltrasi grid rahasia dengan kecepatan manuver tinggi.',
+    perkText: 'Gaya visual hijau neon stealth'
+  },
+  {
+    id: 'mecha-robot',
+    name: 'Mecha Bot Titan',
+    title: 'Unit Tempur Baja Cyber',
+    icon: '🤖',
+    color: 'from-amber-500 to-orange-600',
+    price: 120,
+    rarity: 'rare',
+    description: 'Robot bersenjatakan inti tenaga plasma dan baju zirah titanium.',
+    perkText: 'Aura perisai emas berenergi'
+  },
+  {
+    id: 'space-pilot',
+    name: 'Astro Commander',
+    title: 'Kapten Armada Antariksa',
+    icon: '👨‍🚀',
+    color: 'from-blue-500 to-indigo-600',
+    price: 180,
+    minLevel: 2,
+    rarity: 'rare',
+    description: 'Penjelajah gugusan bintang dengan helm augmented reality holografis.',
+    perkText: 'Membuka tema visual kosmik'
+  },
+  {
+    id: 'cyber-cat',
+    name: 'Neko Cyberpunk',
+    title: 'Kucing Agen Rahasia',
+    icon: '🐱',
+    color: 'from-rose-500 to-fuchsia-600',
+    price: 220,
+    rarity: 'rare',
+    description: 'Kucing lincah ber-implan cybernetic dengan refleks 9 nyawa.',
+    perkText: 'Aura pesona fuchsia futuristik'
+  },
+  {
+    id: 'arcade-ghost',
+    name: 'Phantom Glitch',
+    title: 'Hantu Pemakan Skor',
+    icon: '👻',
+    color: 'from-yellow-400 to-amber-600',
+    price: 280,
+    minLevel: 3,
+    rarity: 'epic',
+    description: 'Makhluk glitch digital yang mampu menembus tembok matriks data.',
+    perkText: 'Gaya transparan glitch unik'
+  },
+  {
+    id: 'alien-boss',
+    name: 'Xenon Overlord',
+    title: 'Penguasa Dimensi Luar',
+    icon: '👾',
+    color: 'from-violet-500 to-purple-800',
+    price: 350,
+    minLevel: 4,
+    rarity: 'epic',
+    description: 'Bos penjaga gerbang arkade dengan kekuatan telekinesis kosmik.',
+    perkText: 'Mahkota hologram ungu raja arkade'
+  },
+  {
+    id: 'cyber-dragon',
+    name: 'Ryu Matrix Dragon',
+    title: 'Naga Purba Cybernetic',
+    icon: '🐉',
+    color: 'from-red-500 via-amber-500 to-yellow-400',
+    price: 450,
+    minLevel: 5,
+    rarity: 'epic',
+    description: 'Naga legendaris pemuntah laser berkekuatan mega-gigawatt.',
+    perkText: 'Aura api naga emas membara'
+  },
+  {
+    id: 'super-valkyrie',
+    name: 'Cyber Valkyrie',
+    title: 'Pelindung Singgasana Cyber',
+    icon: '🧝‍♀️',
+    color: 'from-cyan-400 via-teal-400 to-emerald-500',
+    price: 550,
+    minLevel: 6,
+    rarity: 'legendary',
+    description: 'Prajurit abadi beroda sayap kuantum dan pedang spektrum pelangi.',
+    perkText: 'Efek kilau cyan murni'
+  },
+  {
+    id: 'dark-lord',
+    name: 'Shadow Overclock',
+    title: 'Hacker Gelap Super-AI',
+    icon: '👑',
+    color: 'from-zinc-800 via-slate-900 to-amber-400',
+    price: 750,
+    minLevel: 8,
+    rarity: 'legendary',
+    description: 'Entitas kecerdasan buatan tertinggi yang menguasai seluruh dunia Nova Arcade.',
+    perkText: 'Gelar Eksklusif Penguasa Nova'
+  },
+  {
+    id: 'cosmic-djinn',
+    name: 'Genesis Chrono',
+    title: 'Dewa Ruang & Waktu',
+    icon: '⚡',
+    color: 'from-yellow-300 via-orange-500 to-purple-600',
+    price: 1000,
+    minLevel: 10,
+    rarity: 'legendary',
+    description: 'Karakter paling langka pembawa takdir rekor tertinggi antargalaksi.',
+    perkText: 'Efek kilat abadi & Penguasa Skor'
+  }
 ];
+
+export const AVATAR_LIST = SHOP_CHARACTERS.map(c => ({
+  id: c.id,
+  label: c.name,
+  icon: c.icon,
+  color: c.color
+}));

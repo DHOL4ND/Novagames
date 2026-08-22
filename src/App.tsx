@@ -16,6 +16,7 @@ import { GameWrapper } from './components/GameWrapper';
 import { ProfileModal } from './components/ProfileModal';
 import { QuestsModal } from './components/QuestsModal';
 import { RandomGameModal } from './components/RandomGameModal';
+import { ShopModal } from './components/ShopModal';
 import {
   Award,
   ChevronRight,
@@ -28,6 +29,7 @@ import {
   Play,
   Rocket,
   Search,
+  ShoppingBag,
   Sparkles,
   Trophy,
   Zap
@@ -53,6 +55,7 @@ export default function App() {
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [showQuestsModal, setShowQuestsModal] = useState(false);
   const [showRandomModal, setShowRandomModal] = useState(false);
+  const [showShopModal, setShowShopModal] = useState(false);
 
   // Notifications / Toast
   const [toastMessage, setToastMessage] = useState<{ title: string; desc: string; icon: string } | null>(null);
@@ -215,6 +218,7 @@ export default function App() {
         onOpenProfile={() => setShowProfileModal(true)}
         onOpenQuests={() => setShowQuestsModal(true)}
         onOpenRandom={() => setShowRandomModal(true)}
+        onOpenShop={() => setShowShopModal(true)}
       />
 
       {/* Main Hub Content */}
@@ -255,6 +259,18 @@ export default function App() {
                 </button>
 
                 <button
+                  id="btn-hero-shop"
+                  onClick={() => {
+                    sound.playClick();
+                    setShowShopModal(true);
+                  }}
+                  className="px-5 py-3.5 bg-gradient-to-r from-amber-500/20 to-yellow-500/20 hover:from-amber-500/30 hover:to-yellow-500/30 border border-amber-500/40 text-amber-300 font-semibold text-sm rounded-full flex items-center gap-2 transform hover:scale-105 active:scale-95 transition-all cursor-pointer backdrop-blur-md"
+                >
+                  <ShoppingBag className="w-4 h-4 text-amber-400" />
+                  <span>Toko Karakter (Beli Avatar)</span>
+                </button>
+
+                <button
                   id="btn-hero-spin"
                   onClick={() => setShowRandomModal(true)}
                   className="px-5 py-3.5 bg-slate-800/60 hover:bg-slate-700/60 border border-slate-700/60 text-slate-200 font-semibold text-sm rounded-full flex items-center gap-2 transform hover:scale-105 active:scale-95 transition-all cursor-pointer backdrop-blur-md"
@@ -271,10 +287,20 @@ export default function App() {
                 <div className="text-lg md:text-xl font-extrabold text-cyan-400 font-mono">8+</div>
                 <div className="text-[11px] text-slate-400">Game Siap Main</div>
               </div>
-              <div className="bg-slate-900/50 backdrop-blur-sm p-3 rounded-2xl border border-slate-800/60">
-                <div className="text-lg md:text-xl font-extrabold text-amber-400 font-mono">{profile.coins}</div>
-                <div className="text-[11px] text-slate-400">Koin Arkade</div>
-              </div>
+              <button
+                onClick={() => {
+                  sound.playClick();
+                  setShowShopModal(true);
+                }}
+                className="bg-slate-900/50 hover:bg-slate-800/80 backdrop-blur-sm p-3 rounded-2xl border border-amber-500/30 text-center cursor-pointer transition-all hover:scale-105"
+                title="Buka Toko Karakter"
+              >
+                <div className="text-lg md:text-xl font-extrabold text-amber-400 font-mono flex items-center justify-center gap-1">
+                  <span>{profile.coins}</span>
+                  <ShoppingBag className="w-3.5 h-3.5 text-amber-400" />
+                </div>
+                <div className="text-[11px] text-amber-300 font-semibold">Buka Toko Karakter</div>
+              </button>
               <div className="bg-slate-900/50 backdrop-blur-sm p-3 rounded-2xl border border-slate-800/60">
                 <div className="text-lg md:text-xl font-extrabold text-indigo-400 font-mono">Lv.{profile.level}</div>
                 <div className="text-[11px] text-slate-400">Level Pemain</div>
@@ -385,6 +411,19 @@ export default function App() {
           profile={profile}
           onClose={() => setShowProfileModal(false)}
           onUpdateProfile={setProfile}
+          onOpenShop={() => {
+            setShowProfileModal(false);
+            setShowShopModal(true);
+          }}
+        />
+      )}
+
+      {showShopModal && (
+        <ShopModal
+          profile={profile}
+          onClose={() => setShowShopModal(false)}
+          onUpdateProfile={setProfile}
+          onNotify={(title, desc, icon) => setToastMessage({ title, desc, icon })}
         />
       )}
 

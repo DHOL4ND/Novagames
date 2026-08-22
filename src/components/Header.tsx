@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { PlayerProfile, DailyQuest } from '../types';
 import { sound } from '../utils/audio';
 import { AVATAR_LIST } from '../data/games';
-import { Coins, Dices, Flame, Gamepad2, Gift, Search, Sparkles, User, Volume2, VolumeX } from 'lucide-react';
+import { Coins, Dices, Flame, Gamepad2, Gift, Search, ShoppingBag, Sparkles, User, Volume2, VolumeX } from 'lucide-react';
 
 interface HeaderProps {
   profile: PlayerProfile;
@@ -12,6 +12,7 @@ interface HeaderProps {
   onOpenProfile: () => void;
   onOpenQuests: () => void;
   onOpenRandom: () => void;
+  onOpenShop: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -21,7 +22,8 @@ export const Header: React.FC<HeaderProps> = ({
   onSearchChange,
   onOpenProfile,
   onOpenQuests,
-  onOpenRandom
+  onOpenRandom,
+  onOpenShop
 }) => {
   const [muted, setMuted] = useState(sound.getMuted());
   const [volume, setVolume] = useState(sound.getVolume());
@@ -71,8 +73,19 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
           </div>
 
-          {/* Mobile Profile & Sound Bar */}
+          {/* Mobile Actions: Shop, Sound & Profile */}
           <div className="flex md:hidden items-center gap-2">
+            <button
+              id="btn-shop-mobile"
+              onClick={() => {
+                sound.playClick();
+                onOpenShop();
+              }}
+              className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-300 text-xs font-bold"
+            >
+              <ShoppingBag className="w-3.5 h-3.5" />
+              <span>Toko</span>
+            </button>
             <button
               id="btn-sound-mobile"
               onClick={toggleMute}
@@ -114,6 +127,19 @@ export const Header: React.FC<HeaderProps> = ({
 
         {/* Action Hub & Profile (Desktop) */}
         <div className="hidden md:flex items-center gap-2.5">
+          {/* Shop Button */}
+          <button
+            id="btn-shop"
+            onClick={() => {
+              sound.playClick();
+              onOpenShop();
+            }}
+            className="px-3.5 py-1.5 rounded-full bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-300 hover:text-amber-200 text-xs font-semibold flex items-center gap-1.5 transition-all transform hover:scale-105 active:scale-95 cursor-pointer shadow-sm shadow-amber-500/10"
+          >
+            <ShoppingBag className="w-3.5 h-3.5 text-amber-400" />
+            <span>Toko Karakter</span>
+          </button>
+
           {/* Spin Random Game Button */}
           <button
             id="btn-random-game"

@@ -20,6 +20,19 @@ export interface GameMetadata {
   };
 }
 
+export interface ShopCharacter {
+  id: string;
+  name: string;
+  title: string;
+  icon: string;
+  color: string;
+  price: number;
+  minLevel?: number;
+  rarity: 'common' | 'rare' | 'epic' | 'legendary';
+  description: string;
+  perkText: string;
+}
+
 export interface PlayerProfile {
   name: string;
   avatar: string;
@@ -28,6 +41,7 @@ export interface PlayerProfile {
   level: number;
   totalGamesPlayed: number;
   unlockedAchievements: string[];
+  unlockedAvatars: string[];
   favorites: string[];
   highScores: Record<string, number>;
 }

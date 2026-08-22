@@ -13,6 +13,7 @@ export const DEFAULT_PROFILE: PlayerProfile = {
   level: 1,
   totalGamesPlayed: 0,
   unlockedAchievements: [],
+  unlockedAvatars: ['cyber-samurai', 'pixel-wizard'],
   favorites: ['cyber-runner', 'neon-snake'],
   highScores: {
     'cyber-runner': 120,
@@ -31,7 +32,14 @@ export function loadPlayerProfile(): PlayerProfile {
     const data = localStorage.getItem(STORAGE_KEY);
     if (data) {
       const parsed = JSON.parse(data);
-      return { ...DEFAULT_PROFILE, ...parsed };
+      const profile = { ...DEFAULT_PROFILE, ...parsed };
+      if (!profile.unlockedAvatars || !Array.isArray(profile.unlockedAvatars)) {
+        profile.unlockedAvatars = ['cyber-samurai', 'pixel-wizard'];
+      }
+      if (!profile.unlockedAvatars.includes(profile.avatar)) {
+        profile.unlockedAvatars.push(profile.avatar);
+      }
+      return profile;
     }
   } catch {}
   return DEFAULT_PROFILE;

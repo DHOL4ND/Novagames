@@ -1,20 +1,22 @@
 import React, { useState } from 'react';
 import { PlayerProfile } from '../types';
-import { AVATAR_LIST, INITIAL_ACHIEVEMENTS, GAMES_DATA } from '../data/games';
+import { SHOP_CHARACTERS, INITIAL_ACHIEVEMENTS, GAMES_DATA } from '../data/games';
 import { sound } from '../utils/audio';
 import { fireCelebrationConfetti } from '../utils/storage';
-import { Award, Check, Coins, Edit3, Flame, Gamepad2, Heart, Shield, Sparkles, Trophy, User, X } from 'lucide-react';
+import { Award, Check, Coins, Edit3, Flame, Gamepad2, Heart, Lock, Shield, ShoppingBag, Sparkles, Trophy, User, X } from 'lucide-react';
 
 interface ProfileModalProps {
   profile: PlayerProfile;
   onClose: () => void;
   onUpdateProfile: (newProfile: PlayerProfile) => void;
+  onOpenShop?: () => void;
 }
 
 export const ProfileModal: React.FC<ProfileModalProps> = ({
   profile,
   onClose,
-  onUpdateProfile
+  onUpdateProfile,
+  onOpenShop
 }) => {
   const [tab, setTab] = useState<'profile' | 'achievements' | 'stats'>('profile');
   const [nameInput, setNameInput] = useState(profile.name);
@@ -31,8 +33,10 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
     setIsEditingName(false);
   };
 
+  const unlockedAvatars = profile.unlockedAvatars || ['cyber-samurai', 'pixel-wizard'];
   const unlockedCount = profile.unlockedAchievements.length;
   const totalAchievements = INITIAL_ACHIEVEMENTS.length;
+  const activeChar = SHOP_CHARACTERS.find(a => a.id === selectedAvatar) || SHOP_CHARACTERS[0];
 
   return (
     <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200">
@@ -107,8 +111,8 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
               {/* Level & XP Banner */}
               <div className="p-4 rounded-2xl bg-gradient-to-r from-slate-900/80 via-slate-900/40 to-slate-900/80 border border-slate-800/60 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-13 h-13 rounded-2xl bg-indigo-500/20 border border-indigo-400/30 flex items-center justify-center text-3xl shadow-md">
-                    {AVATAR_LIST.find(a => a.id === selectedAvatar)?.icon}
+                  <div className={`w-13 h-13 rounded-2xl bg-gradient-to-br ${activeChar.color} border border-indigo-400/30 flex items-center justify-center text-3xl shadow-md`}>
+                    {activeChar.icon}
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
@@ -118,7 +122,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                       </span>
                     </div>
                     <div className="text-xs text-slate-400 mt-0.5">
-                      Total Main: <strong className="text-slate-200">{profile.totalGamesPlayed} game</strong>
+                      Karakter: <strong className="text-slate-200">{activeChar.name}</strong> • Total: <strong className="text-slate-200">{profile.totalGamesPlayed} game</strong>
                     </div>
                   </div>
                 </div>
@@ -154,28 +158,62 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                 </div>
               </div>
 
-              {/* Avatar Selector */}
+              {/* Avatar Selector with Shop Link */}
               <div>
-                <label className="text-xs font-semibold text-slate-300 block mb-2">Pilih Avatar Cyber:</label>
-                <div className="grid grid-cols-4 gap-2.5">
-                  {AVATAR_LIST.map((av) => (
+                <div className="flex items-center justify-between mb-2">
+                  <label className="text-xs font-semibold text-slate-300">Pilih Avatar Aktif:</label>
+                  {onOpenShop && (
                     <button
-                      key={av.id}
                       onClick={() => {
                         sound.playClick();
-                        setSelectedAvatar(av.id);
-                        onUpdateProfile({ ...profile, avatar: av.id });
+                        onClose();
+                        onOpenShop();
                       }}
-                      className={`p-3 rounded-2xl border flex flex-col items-center gap-1.5 transition-all cursor-pointer ${
-                        selectedAvatar === av.id
-                          ? 'bg-indigo-500/20 border-indigo-400 shadow-md shadow-indigo-500/20 scale-105'
-                          : 'bg-slate-900/40 border-slate-800 hover:border-slate-700'
-                      }`}
+                      className="text-xs text-amber-400 hover:text-amber-300 font-semibold flex items-center gap-1 cursor-pointer"
                     >
-                      <span className="text-2xl">{av.icon}</span>
-                      <span className="text-[10px] font-semibold text-slate-300">{av.label}</span>
+                      <ShoppingBag className="w-3.5 h-3.5" />
+                      <span>Beli Avatar di Toko</span>
                     </button>
-                  ))}
+                  )}
+                </div>
+
+                <div className="grid grid-cols-4 gap-2.5">
+                  {SHOP_CHARACTERS.map((char) => {
+                    const isUnlocked = unlockedAvatars.includes(char.id);
+                    const isSelected = selectedAvatar === char.id;
+
+                    return (
+                      <button
+                        key={char.id}
+                        disabled={!isUnlocked}
+                        onClick={() => {
+                          if (isUnlocked) {
+                            sound.playClick();
+                            setSelectedAvatar(char.id);
+                            onUpdateProfile({ ...profile, avatar: char.id });
+                          }
+                        }}
+                        className={`relative p-3 rounded-2xl border flex flex-col items-center gap-1.5 transition-all ${
+                          !isUnlocked
+                            ? 'bg-slate-900/20 border-slate-800/60 opacity-50 cursor-not-allowed'
+                            : isSelected
+                            ? 'bg-indigo-500/20 border-indigo-400 shadow-md shadow-indigo-500/20 scale-105 cursor-pointer'
+                            : 'bg-slate-900/40 border-slate-800 hover:border-slate-700 cursor-pointer'
+                        }`}
+                      >
+                        <span className="text-2xl">{char.icon}</span>
+                        <span className="text-[10px] font-semibold text-slate-300 truncate w-full text-center">
+                          {char.name}
+                        </span>
+
+                        {!isUnlocked && (
+                          <div className="absolute top-1.5 right-1.5 text-[10px] text-amber-400">
+                            <Lock className="w-3 h-3" />
+                          </div>
+                        )}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             </div>
@@ -261,3 +299,4 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
     </div>
   );
 };
+
