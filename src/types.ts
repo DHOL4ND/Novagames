@@ -121,6 +121,7 @@ export interface MultiplayerRoom {
     speed: number;
     isFireball?: boolean;
     lastHitter?: string;
+    timestamp?: number;
   };
   score1: number;
   score2: number;

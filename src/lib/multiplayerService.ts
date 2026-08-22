@@ -32,8 +32,8 @@ export async function createMultiplayerRoom(
   gameId: string,
   profile: PlayerProfile
 ): Promise<MultiplayerRoom> {
-  const user = await ensureAuthUser();
-  const playerId = user ? user.uid : getLocalDeviceId();
+  await ensureAuthUser();
+  const playerId = getLocalDeviceId();
   const code = generateRoomCode();
   const roomId = `ROOM_${code}`;
   const char = SHOP_CHARACTERS.find(c => c.id === profile.avatar) || SHOP_CHARACTERS[0];
@@ -100,8 +100,8 @@ export async function joinMultiplayerRoomByCode(
     const roomData = snap.data() as MultiplayerRoom;
     const playerKeys = Object.keys(roomData.players || {});
 
-    const user = await ensureAuthUser();
-    const playerId = user ? user.uid : getLocalDeviceId();
+    await ensureAuthUser();
+    const playerId = getLocalDeviceId();
 
     // If player already in room, allow rejoin
     if (roomData.players[playerId]) {

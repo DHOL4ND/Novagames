@@ -69,20 +69,41 @@ export const NeonPongGame: React.FC<NeonPongGameProps> = ({
   const [countdown, setCountdown] = useState<number | null>(null);
 
   const canvasRef = useRef<HTMLDivElement>(null);
-  const animationFrameRef = useRef<number | null>(null);
   const myPlayerId = getLocalDeviceId();
+
+  // Reference for smooth continuous simulation and guest-side interpolation
+  const ballPhysicsRef = useRef({
+    x: 50,
+    y: 50,
+    vx: 0.7,
+    vy: 0.2,
+    speed: 1.0,
+    isFireball: false,
+    lastUpdate: Date.now()
+  });
+
+  const myPaddleYRef = useRef(50);
+  const opponentPaddleYRef = useRef(50);
+  const lastSentPaddleYRef = useRef<number>(-1);
+  const lastPaddleSentTimeRef = useRef<number>(0);
+  const lastHostSyncTimeRef = useRef<number>(0);
 
   // Determine if this client is Player 1 (Host/Left) or Player 2 (Guest/Right)
   const isHost = room ? room.hostId === myPlayerId : true;
   const isPlayer1 = isHost || isBotMode;
 
-  const playerKeys = room ? Object.keys(room.players) : [];
-  const hostPlayer = room && room.players[room.hostId] ? room.players[room.hostId] : null;
+  const playerKeys = room ? Object.keys(room.players || {}) : [];
+  const hostPlayer = room && room.players && room.players[room.hostId] ? room.players[room.hostId] : null;
   const guestId = room ? playerKeys.find((id) => id !== room.hostId) : null;
-  const guestPlayer = room && guestId ? room.players[guestId] : null;
+  const guestPlayer = room && guestId && room.players ? room.players[guestId] : null;
 
   const myPlayerInfo = isHost ? hostPlayer : guestPlayer;
   const opponentPlayerInfo = isHost ? guestPlayer : hostPlayer;
+
+  // Keep ref up to date
+  useEffect(() => {
+    myPaddleYRef.current = myPaddleY;
+  }, [myPaddleY]);
 
   // Subscribe to room realtime updates
   useEffect(() => {
@@ -98,29 +119,53 @@ export const NeonPongGame: React.FC<NeonPongGameProps> = ({
       }
 
       setRoom(updatedRoom);
-      const pCount = Object.keys(updatedRoom.players || {}).length;
 
-      // Handle room transition to playing
+      // Handle room transition to starting / countdown
       if (updatedRoom.status === 'starting' && gameState === 'waiting') {
         sound.playPowerup();
         setCountdown(3);
+      } else if (updatedRoom.status === 'playing' && gameState === 'waiting' && countdown === null) {
+        setGameState('playing');
       }
 
       // Sync opponent paddle position
-      if (!isHost && hostPlayer?.paddleY !== undefined) {
-        setOpponentPaddleY(hostPlayer.paddleY * 100);
-      } else if (isHost && guestPlayer?.paddleY !== undefined) {
-        setOpponentPaddleY(guestPlayer.paddleY * 100);
+      const opp = isHost
+        ? (updatedRoom.players && guestId ? updatedRoom.players[guestId] : null)
+        : (updatedRoom.players && updatedRoom.hostId ? updatedRoom.players[updatedRoom.hostId] : null);
+
+      if (opp && typeof opp.paddleY === 'number') {
+        const targetOppY = Math.max(10, Math.min(90, opp.paddleY * 100));
+        opponentPaddleYRef.current = targetOppY;
+        setOpponentPaddleY(targetOppY);
       }
 
-      // Sync ball and scores from host if guest
+      // Sync ball and scores from host if we are the guest
       if (!isHost && updatedRoom.ball) {
+        const rb = updatedRoom.ball;
+        const now = Date.now();
+        const latencySec = rb.timestamp ? Math.min((now - rb.timestamp) / 1000, 0.3) : 0.05;
+
+        // Predict current ball position from host velocity (Dead Reckoning)
+        const predictedX = Math.max(2, Math.min(98, rb.x + (rb.vx * rb.speed * latencySec * 60)));
+        const predictedY = Math.max(2, Math.min(98, rb.y + (rb.vy * rb.speed * latencySec * 60)));
+
+        ballPhysicsRef.current = {
+          x: predictedX,
+          y: predictedY,
+          vx: rb.vx,
+          vy: rb.vy,
+          speed: rb.speed || 1,
+          isFireball: !!rb.isFireball,
+          lastUpdate: now
+        };
+
         setBall({
-          x: updatedRoom.ball.x,
-          y: updatedRoom.ball.y,
-          isFireball: !!updatedRoom.ball.isFireball
+          x: predictedX,
+          y: predictedY,
+          isFireball: !!rb.isFireball
         });
-        setScores({ p1: updatedRoom.score1, p2: updatedRoom.score2 });
+
+        setScores({ p1: updatedRoom.score1 || 0, p2: updatedRoom.score2 || 0 });
       }
 
       // Check win status
@@ -140,7 +185,7 @@ export const NeonPongGame: React.FC<NeonPongGameProps> = ({
     });
 
     return () => unsub();
-  }, [room?.id, isHost, myPlayerId, isBotMode, gameState]);
+  }, [room?.id, isHost, myPlayerId, isBotMode, gameState, guestId, countdown]);
 
   // Countdown timer before starting
   useEffect(() => {
@@ -160,6 +205,18 @@ export const NeonPongGame: React.FC<NeonPongGameProps> = ({
     }
   }, [countdown, isHost, room]);
 
+  // Send paddle position over network with throttle (every 40ms or on significant delta)
+  const sendPaddlePositionThrottled = (yRatio: number) => {
+    if (isBotMode || !room?.id) return;
+    const now = Date.now();
+    const prevY = lastSentPaddleYRef.current;
+    if (now - lastPaddleSentTimeRef.current > 40 || Math.abs(yRatio - prevY) > 0.03) {
+      lastSentPaddleYRef.current = yRatio;
+      lastPaddleSentTimeRef.current = now;
+      updatePaddlePosition(room.id, myPlayerId, yRatio);
+    }
+  };
+
   // Handle paddle movement input (Touch / Mouse / Keyboard)
   const handleMovePaddle = (clientY: number) => {
     if (!canvasRef.current || gameState !== 'playing') return;
@@ -168,10 +225,8 @@ export const NeonPongGame: React.FC<NeonPongGameProps> = ({
     const percentage = Math.max(10, Math.min(90, (relativeY / rect.height) * 100));
 
     setMyPaddleY(percentage);
-
-    if (!isBotMode && room?.id) {
-      updatePaddlePosition(room.id, myPlayerId, percentage / 100);
-    }
+    myPaddleYRef.current = percentage;
+    sendPaddlePositionThrottled(percentage / 100);
   };
 
   // Keyboard controls
@@ -181,14 +236,16 @@ export const NeonPongGame: React.FC<NeonPongGameProps> = ({
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') {
         setMyPaddleY((prev) => {
-          const next = Math.max(10, prev - 6);
-          if (!isBotMode && room?.id) updatePaddlePosition(room.id, myPlayerId, next / 100);
+          const next = Math.max(10, prev - 7);
+          myPaddleYRef.current = next;
+          sendPaddlePositionThrottled(next / 100);
           return next;
         });
       } else if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') {
         setMyPaddleY((prev) => {
-          const next = Math.min(90, prev + 6);
-          if (!isBotMode && room?.id) updatePaddlePosition(room.id, myPlayerId, next / 100);
+          const next = Math.min(90, prev + 7);
+          myPaddleYRef.current = next;
+          sendPaddlePositionThrottled(next / 100);
           return next;
         });
       }
@@ -198,142 +255,34 @@ export const NeonPongGame: React.FC<NeonPongGameProps> = ({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [gameState, isBotMode, room?.id, myPlayerId]);
 
-  // Physics simulation loop (Only run by Host or in Bot Mode for single-authority collision)
+  // Main Unified Physics Simulation Loop
   useEffect(() => {
     if (gameState !== 'playing') return;
-    if (!isHost && !isBotMode) return;
 
-    let ballX = 50;
-    let ballY = 50;
-    let vx = (Math.random() > 0.5 ? 0.7 : -0.7);
-    let vy = (Math.random() - 0.5) * 0.8;
-    let speed = 1.0;
-    let isFire = false;
+    // Reset ball physics when starting fresh
+    if (isHost || isBotMode) {
+      ballPhysicsRef.current = {
+        x: 50,
+        y: 50,
+        vx: (Math.random() > 0.5 ? 0.75 : -0.75),
+        vy: (Math.random() - 0.5) * 0.7,
+        speed: 1.0,
+        isFireball: false,
+        lastUpdate: Date.now()
+      };
+    }
+
+    let botY = 50;
     let scoreP1 = scores.p1;
     let scoreP2 = scores.p2;
     const maxScore = 5;
 
-    let botY = 50;
-
-    const interval = setInterval(() => {
-      // Bot AI logic if in Bot Mode
-      if (isBotMode) {
-        const targetY = ballY;
-        const diff = targetY - botY;
-        botY += Math.sign(diff) * Math.min(Math.abs(diff), 1.2);
-        setOpponentPaddleY(botY);
-      }
-
-      // Update ball
-      ballX += vx * speed;
-      ballY += vy * speed;
-
-      // Top & Bottom Wall collision
-      if (ballY <= 4) {
-        ballY = 4;
-        vy = -vy;
-        sound.playJump();
-      } else if (ballY >= 96) {
-        ballY = 96;
-        vy = -vy;
-        sound.playJump();
-      }
-
-      // Paddle Left (Player 1 / Host)
-      const p1Y = isPlayer1 ? myPaddleY : opponentPaddleY;
-      const p2Y = !isPlayer1 ? myPaddleY : opponentPaddleY;
-
-      // Check Left Paddle Collision (x around 5%)
-      if (ballX <= 7 && ballX >= 3) {
-        if (Math.abs(ballY - p1Y) <= 12) {
-          ballX = 7.1;
-          const hitOffset = (ballY - p1Y) / 12; // -1 to 1
-          vy = hitOffset * 0.9;
-          vx = Math.abs(vx) * 1.05; // speed up slightly
-          speed = Math.min(speed + 0.04, 2.2);
-          isFire = speed > 1.4;
-          sound.playLaser();
-        }
-      }
-
-      // Check Right Paddle Collision (x around 95%)
-      if (ballX >= 93 && ballX <= 97) {
-        if (Math.abs(ballY - p2Y) <= 12) {
-          ballX = 92.9;
-          const hitOffset = (ballY - p2Y) / 12;
-          vy = hitOffset * 0.9;
-          vx = -Math.abs(vx) * 1.05;
-          speed = Math.min(speed + 0.04, 2.2);
-          isFire = speed > 1.4;
-          sound.playLaser();
-        }
-      }
-
-      // Left Goal (Player 2 scores)
-      if (ballX < 0) {
-        scoreP2 += 1;
-        sound.playCoin();
-        ballX = 50;
-        ballY = 50;
-        vx = 0.7;
-        vy = (Math.random() - 0.5) * 0.6;
-        speed = 1.0;
-        isFire = false;
-        setScores({ p1: scoreP1, p2: scoreP2 });
-
-        if (scoreP2 >= maxScore) {
-          const winner = isPlayer1 ? 'p2' : 'p1';
-          handleEndMatch(winner === 'p1' ? (isHost ? myPlayerId : guestId || '') : (isHost ? guestId || '' : myPlayerId));
-          return;
-        }
-      }
-
-      // Right Goal (Player 1 scores)
-      if (ballX > 100) {
-        scoreP1 += 1;
-        sound.playCoin();
-        ballX = 50;
-        ballY = 50;
-        vx = -0.7;
-        vy = (Math.random() - 0.5) * 0.6;
-        speed = 1.0;
-        isFire = false;
-        setScores({ p1: scoreP1, p2: scoreP2 });
-
-        if (scoreP1 >= maxScore) {
-          const winner = isPlayer1 ? 'p1' : 'p2';
-          handleEndMatch(winner === 'p1' ? (isHost ? myPlayerId : guestId || '') : (isHost ? guestId || '' : myPlayerId));
-          return;
-        }
-      }
-
-      // Update local state
-      setBall({ x: ballX, y: ballY, isFireball: isFire });
-
-      // If online host, sync state to Firebase
-      if (!isBotMode && room?.id) {
-        hostUpdateGameState(room.id, {
-          ball: {
-            x: ballX,
-            y: ballY,
-            vx,
-            vy,
-            speed,
-            isFireball: isFire
-          },
-          score1: scoreP1,
-          score2: scoreP2
-        });
-      }
-    }, 1000 / 60);
-
     const handleEndMatch = (winPlayerId: string) => {
-      clearInterval(interval);
       const isMe = winPlayerId === myPlayerId || (isBotMode && scoreP1 >= maxScore);
       setIsWinner(isMe);
       setGameState('gameover');
 
-      if (!isBotMode && room?.id) {
+      if (!isBotMode && room?.id && isHost) {
         hostUpdateGameState(room.id, {
           status: 'ended',
           winnerId: winPlayerId,
@@ -351,8 +300,155 @@ export const NeonPongGame: React.FC<NeonPongGameProps> = ({
       }
     };
 
+    // 60 FPS physics tick
+    const interval = setInterval(() => {
+      const b = ballPhysicsRef.current;
+
+      if (isHost || isBotMode) {
+        // --- HOST / BOT SIMULATION ---
+
+        // Bot AI movement
+        if (isBotMode) {
+          const targetY = b.y;
+          const diff = targetY - botY;
+          botY += Math.sign(diff) * Math.min(Math.abs(diff), 1.25);
+          opponentPaddleYRef.current = botY;
+          setOpponentPaddleY(botY);
+        }
+
+        // Advance ball position
+        b.x += b.vx * b.speed;
+        b.y += b.vy * b.speed;
+
+        // Top & Bottom Wall collision
+        if (b.y <= 4) {
+          b.y = 4;
+          b.vy = Math.abs(b.vy);
+          sound.playJump();
+        } else if (b.y >= 96) {
+          b.y = 96;
+          b.vy = -Math.abs(b.vy);
+          sound.playJump();
+        }
+
+        // Paddle Coordinates
+        const p1Y = isPlayer1 ? myPaddleYRef.current : opponentPaddleYRef.current;
+        const p2Y = !isPlayer1 ? myPaddleYRef.current : opponentPaddleYRef.current;
+
+        // Check Left Paddle Collision (x: 4% ~ 8%)
+        if (b.x <= 7.5 && b.x >= 3 && b.vx < 0) {
+          if (Math.abs(b.y - p1Y) <= 13) {
+            b.x = 7.6;
+            const hitOffset = (b.y - p1Y) / 13; // -1 to 1
+            b.vy = hitOffset * 0.95;
+            b.vx = Math.abs(b.vx) * 1.04;
+            b.speed = Math.min(b.speed + 0.05, 2.3);
+            b.isFireball = b.speed > 1.35;
+            sound.playLaser();
+          }
+        }
+
+        // Check Right Paddle Collision (x: 92% ~ 97%)
+        if (b.x >= 92.5 && b.x <= 97 && b.vx > 0) {
+          if (Math.abs(b.y - p2Y) <= 13) {
+            b.x = 92.4;
+            const hitOffset = (b.y - p2Y) / 13;
+            b.vy = hitOffset * 0.95;
+            b.vx = -Math.abs(b.vx) * 1.04;
+            b.speed = Math.min(b.speed + 0.05, 2.3);
+            b.isFireball = b.speed > 1.35;
+            sound.playLaser();
+          }
+        }
+
+        // Left Goal (Player 2 scores)
+        if (b.x < 0) {
+          scoreP2 += 1;
+          sound.playCoin();
+          b.x = 50;
+          b.y = 50;
+          b.vx = 0.75;
+          b.vy = (Math.random() - 0.5) * 0.6;
+          b.speed = 1.0;
+          b.isFireball = false;
+          setScores({ p1: scoreP1, p2: scoreP2 });
+
+          if (scoreP2 >= maxScore) {
+            clearInterval(interval);
+            const winner = isPlayer1 ? 'p2' : 'p1';
+            handleEndMatch(winner === 'p1' ? (isHost ? myPlayerId : guestId || '') : (isHost ? guestId || '' : myPlayerId));
+            return;
+          }
+        }
+
+        // Right Goal (Player 1 scores)
+        if (b.x > 100) {
+          scoreP1 += 1;
+          sound.playCoin();
+          b.x = 50;
+          b.y = 50;
+          b.vx = -0.75;
+          b.vy = (Math.random() - 0.5) * 0.6;
+          b.speed = 1.0;
+          b.isFireball = false;
+          setScores({ p1: scoreP1, p2: scoreP2 });
+
+          if (scoreP1 >= maxScore) {
+            clearInterval(interval);
+            const winner = isPlayer1 ? 'p1' : 'p2';
+            handleEndMatch(winner === 'p1' ? (isHost ? myPlayerId : guestId || '') : (isHost ? guestId || '' : myPlayerId));
+            return;
+          }
+        }
+
+        // Update local ball render
+        setBall({ x: b.x, y: b.y, isFireball: b.isFireball });
+
+        // Host broadcasts state to Firebase (every 45ms)
+        if (!isBotMode && room?.id) {
+          const now = Date.now();
+          if (now - lastHostSyncTimeRef.current > 45) {
+            lastHostSyncTimeRef.current = now;
+            hostUpdateGameState(room.id, {
+              ball: {
+                x: Number(b.x.toFixed(2)),
+                y: Number(b.y.toFixed(2)),
+                vx: Number(b.vx.toFixed(3)),
+                vy: Number(b.vy.toFixed(3)),
+                speed: Number(b.speed.toFixed(2)),
+                isFireball: b.isFireball,
+                timestamp: now
+              },
+              score1: scoreP1,
+              score2: scoreP2
+            });
+          }
+        }
+      } else {
+        // --- GUEST CONTINUOUS LOCAL PREDICTION ---
+        // Step forward with last known velocity so ball glides smoothly between network ticks
+        b.x += b.vx * b.speed;
+        b.y += b.vy * b.speed;
+
+        // Bounce walls locally for visual perfection
+        if (b.y <= 4) {
+          b.y = 4;
+          b.vy = Math.abs(b.vy);
+        } else if (b.y >= 96) {
+          b.y = 96;
+          b.vy = -Math.abs(b.vy);
+        }
+
+        setBall({
+          x: Math.max(1, Math.min(99, b.x)),
+          y: Math.max(1, Math.min(99, b.y)),
+          isFireball: b.isFireball
+        });
+      }
+    }, 1000 / 60);
+
     return () => clearInterval(interval);
-  }, [gameState, isHost, isBotMode, myPaddleY, opponentPaddleY, scores, room?.id, myPlayerId, isPlayer1, guestId, profile.name, opponentPlayerInfo?.name]);
+  }, [gameState, isHost, isBotMode, scores.p1, scores.p2, room?.id, myPlayerId, isPlayer1, guestId, profile.name, opponentPlayerInfo?.name]);
 
   // Create room handler
   const handleCreateRoom = async () => {
