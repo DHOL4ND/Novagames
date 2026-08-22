@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { PlayerProfile, GameMetadata, LeaderboardPlayer } from '../types';
 import { GAMES_DATA } from '../data/games';
 import {
@@ -6,15 +6,19 @@ import {
   getSortedGameScoreLeaderboard,
   getTierFromLevel
 } from '../data/leaderboardData';
+import { subscribeToOnlineLeaderboard, syncPlayerToCloud } from '../lib/cloudLeaderboard';
 import { sound } from '../utils/audio';
 import {
   Award,
+  Check,
   ChevronRight,
   Crown,
   Edit3,
   Flame,
   Gamepad2,
+  Globe,
   Medal,
+  Radio,
   Shield,
   Sparkles,
   Star,
@@ -41,9 +45,31 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
   const [selectedGameId, setSelectedGameId] = useState<string>('cyber-runner');
   const [isEditingNick, setIsEditingNick] = useState(false);
   const [nickInput, setNickInput] = useState(profile.name);
+  const [isOnlineSync, setIsOnlineSync] = useState(false);
 
-  // Compute live level leaderboard
-  const { leaderboard, playerRank, playerEntry } = getSortedLevelLeaderboard(profile);
+  // Live state from Firestore
+  const [liveLeaderboard, setLiveLeaderboard] = useState<LeaderboardPlayer[]>([]);
+  const [livePlayerRank, setLivePlayerRank] = useState<number>(1);
+  const [livePlayerEntry, setLivePlayerEntry] = useState<LeaderboardPlayer | null>(null);
+
+  // Sync profile to cloud upon opening
+  useEffect(() => {
+    syncPlayerToCloud(profile);
+    const unsubscribe = subscribeToOnlineLeaderboard(profile, (data) => {
+      setLiveLeaderboard(data.leaderboard);
+      setLivePlayerRank(data.playerRank);
+      setLivePlayerEntry(data.playerEntry);
+      setIsOnlineSync(true);
+    });
+
+    return () => unsubscribe();
+  }, [profile]);
+
+  // Fallback local calculation if snapshot not yet arrived
+  const localLevelCalc = getSortedLevelLeaderboard(profile);
+  const leaderboard = liveLeaderboard.length > 0 ? liveLeaderboard : localLevelCalc.leaderboard;
+  const playerRank = liveLeaderboard.length > 0 ? livePlayerRank : localLevelCalc.playerRank;
+  const playerEntry = livePlayerEntry || localLevelCalc.playerEntry;
 
   // Compute live game score leaderboard
   const { gameLeaderboard, playerGameRank, playerGameScore } = getSortedGameScoreLeaderboard(
@@ -65,6 +91,10 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
     if (onUpdateNickname) {
       onUpdateNickname(trimmed);
     }
+    syncPlayerToCloud({
+      ...profile,
+      name: trimmed
+    });
     setIsEditingNick(false);
   };
 
@@ -84,12 +114,13 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
                 <h3 className="text-base sm:text-lg font-black text-white tracking-tight">
                   Papan Peringkat Pemain
                 </h3>
-                <span className="px-2 py-0.5 rounded-full bg-amber-500/20 border border-amber-400/30 text-amber-300 text-[10px] font-extrabold uppercase">
-                  Global
+                <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 text-[10px] font-extrabold uppercase flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  Online Cloud
                 </span>
               </div>
               <p className="text-xs text-slate-400">
-                Peringkat level tertinggi, exp, dan skor rekor game
+                Peringkat level tertinggi real-time antar seluruh pemain game
               </p>
             </div>
           </div>

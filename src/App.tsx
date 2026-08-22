@@ -10,6 +10,7 @@ import {
   fireCelebrationConfetti
 } from './utils/storage';
 import { getSortedLevelLeaderboard } from './data/leaderboardData';
+import { syncPlayerToCloud, subscribeToOnlineLeaderboard } from './lib/cloudLeaderboard';
 import { sound } from './utils/audio';
 import { Header } from './components/Header';
 import { GameCard } from './components/GameCard';
@@ -79,10 +80,22 @@ export default function App() {
     }
   }, [toastMessage]);
 
-  // Save profile & quests whenever changed
+  // Live online rank state
+  const [cloudRank, setCloudRank] = useState<number | null>(null);
+
+  // Save profile & quests whenever changed and sync to cloud
   useEffect(() => {
     savePlayerProfile(profile);
+    syncPlayerToCloud(profile);
   }, [profile]);
+
+  // Subscribe to cloud leaderboard for live global rank updates
+  useEffect(() => {
+    const unsub = subscribeToOnlineLeaderboard(profile, (data) => {
+      setCloudRank(data.playerRank);
+    });
+    return () => unsub();
+  }, []);
 
   useEffect(() => {
     saveQuests(quests);
@@ -93,15 +106,20 @@ export default function App() {
       ...prev,
       name: newName
     }));
+    syncPlayerToCloud({
+      ...profile,
+      name: newName
+    });
     setToastMessage({
       title: 'NICKNAME DIPERBARUI! ✨',
-      desc: `Nickname berhasil diubah menjadi "${newName}"`,
+      desc: `Nickname online berhasil diubah menjadi "${newName}"`,
       icon: '👤'
     });
   };
 
-  // Compute live ranking for quick display in Hero
-  const { playerRank } = useMemo(() => getSortedLevelLeaderboard(profile), [profile]);
+  // Compute ranking for quick display in Hero
+  const { playerRank: localRank } = useMemo(() => getSortedLevelLeaderboard(profile), [profile]);
+  const playerRank = cloudRank !== null ? cloudRank : localRank;
 
   const handleToggleFavorite = (gameId: string) => {
     const isFav = profile.favorites.includes(gameId);
