@@ -1,0 +1,6 @@
+{
+  "name": "Nova Game Center",
+  "description": "Pusat game arkade web interaktif dan dinamis dengan beragam game seru, efek visual neon memukau, audio retro, papan skor, dan pencapaian.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
