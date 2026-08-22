@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { GameMetadata, PlayerProfile } from '../types';
 import { sound } from '../utils/audio';
+import { SHOP_CHARACTERS } from '../data/games';
 import { ArrowLeft, Maximize2, Minimize2, RotateCcw, Volume2, VolumeX, Trophy, Sparkles, HelpCircle, Gamepad } from 'lucide-react';
 import { CyberRunner } from '../games/CyberRunner';
 import { SpaceStrike } from '../games/SpaceStrike';
@@ -113,8 +114,13 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({
           <div className="text-center hidden sm:block">
             <h2 className="text-sm font-bold text-white tracking-tight">{game.title}</h2>
             <div className="flex items-center justify-center gap-2 text-[11px] text-slate-400">
-              <span>Rekor Terbaik:</span>
+              <span>Rekor:</span>
               <span className="text-amber-400 font-mono font-bold">{highScore}</span>
+              <span className="text-slate-600">•</span>
+              <span className="text-slate-300 flex items-center gap-1">
+                <span>{SHOP_CHARACTERS.find(c => c.id === profile.avatar)?.icon || '⚔️'}</span>
+                <span>{profile.name}</span>
+              </span>
             </div>
           </div>
         </div>

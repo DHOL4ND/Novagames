@@ -584,13 +584,23 @@ export const CyberRunner: React.FC<CyberRunnerProps> = ({ onGameOver, onScoreUpd
         )}
       </div>
 
-      {/* Main Canvas */}
+      {/* Main Canvas with Direct Tap-to-Control */}
       <div className="relative w-full bg-black rounded-b-xl overflow-hidden border border-t-0 border-cyan-500/30 shadow-2xl shadow-cyan-950/40">
         <canvas
           ref={canvasRef}
           width={700}
           height={320}
-          className="w-full h-auto block"
+          onPointerDown={(e) => {
+            if (gameState !== 'playing') return;
+            const rect = e.currentTarget.getBoundingClientRect();
+            const relativeY = e.clientY - rect.top;
+            if (relativeY < rect.height * 0.6) {
+              jump();
+            } else {
+              slide();
+            }
+          }}
+          className="w-full h-auto block touch-none cursor-pointer"
         />
 
         {/* Start / Game Over Overlay */}
@@ -601,16 +611,16 @@ export const CyberRunner: React.FC<CyberRunnerProps> = ({ onGameOver, onScoreUpd
                 <div className="w-14 h-14 rounded-2xl bg-cyan-500/20 border border-cyan-400/40 flex items-center justify-center mb-3 shadow-lg shadow-cyan-500/20">
                   <Play className="w-7 h-7 text-cyan-400 fill-cyan-400 translate-x-0.5" />
                 </div>
-                <h3 className="text-2xl font-black text-white tracking-wide mb-1">CYBER DASH NEON</h3>
-                <p className="text-sm text-slate-300 max-w-sm mb-5">
+                <h3 className="text-xl sm:text-2xl font-black text-white tracking-wide mb-1">CYBER DASH NEON</h3>
+                <p className="text-xs sm:text-sm text-slate-300 max-w-sm mb-5">
                   Lompat ganda melewati rintangan laser dan menunduk di bawah balok tinggi!
                 </p>
                 <button
                   id="btn-cyber-runner-start"
                   onClick={startGame}
-                  className="px-7 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-bold text-base rounded-xl shadow-lg shadow-cyan-500/30 transform hover:scale-105 active:scale-95 transition-all cursor-pointer"
+                  className="px-7 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-bold text-sm sm:text-base rounded-xl shadow-lg shadow-cyan-500/30 transform hover:scale-105 active:scale-95 transition-all cursor-pointer min-h-[48px]"
                 >
-                  Mulai Lari (Spasi)
+                  Mulai Lari (Ketuk / Spasi)
                 </button>
               </>
             ) : (
@@ -630,7 +640,7 @@ export const CyberRunner: React.FC<CyberRunnerProps> = ({ onGameOver, onScoreUpd
                 <button
                   id="btn-cyber-runner-retry"
                   onClick={startGame}
-                  className="px-6 py-2.5 bg-gradient-to-r from-cyan-500 to-blue-600 text-slate-950 font-bold text-sm rounded-xl shadow-lg shadow-cyan-500/30 flex items-center gap-2 hover:brightness-110 active:scale-95 transition-all cursor-pointer"
+                  className="px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 text-slate-950 font-bold text-sm rounded-xl shadow-lg shadow-cyan-500/30 flex items-center gap-2 hover:brightness-110 active:scale-95 transition-all cursor-pointer min-h-[48px]"
                 >
                   <RotateCcw className="w-4 h-4" /> Main Lagi
                 </button>
@@ -640,23 +650,23 @@ export const CyberRunner: React.FC<CyberRunnerProps> = ({ onGameOver, onScoreUpd
         )}
       </div>
 
-      {/* Onscreen Touch / Mobile Controls */}
-      <div className="w-full mt-3 flex items-center justify-center gap-4 px-2">
-        <button
-          id="btn-cyber-runner-jump"
-          onClick={jump}
-          disabled={gameState !== 'playing'}
-          className="flex-1 py-3.5 bg-slate-800/90 hover:bg-slate-700 active:bg-cyan-600/40 border border-cyan-500/40 rounded-xl text-cyan-300 font-bold text-sm shadow-md active:scale-95 transition-all flex items-center justify-center gap-2 touch-manipulation disabled:opacity-40"
-        >
-          ⬆️ LOMPAT (Tap / Spasi)
-        </button>
+      {/* Ergonomic Dual Thumb Onscreen Mobile Controls */}
+      <div className="w-full mt-3 grid grid-cols-2 gap-3 px-1">
         <button
           id="btn-cyber-runner-slide"
           onClick={slide}
           disabled={gameState !== 'playing'}
-          className="flex-1 py-3.5 bg-slate-800/90 hover:bg-slate-700 active:bg-rose-600/40 border border-rose-500/40 rounded-xl text-rose-300 font-bold text-sm shadow-md active:scale-95 transition-all flex items-center justify-center gap-2 touch-manipulation disabled:opacity-40"
+          className="min-h-[52px] py-3.5 bg-slate-900/90 hover:bg-slate-800 active:bg-rose-900/60 border-2 border-rose-500/50 rounded-2xl text-rose-300 font-black text-sm sm:text-base shadow-lg shadow-rose-950/40 active:scale-95 transition-all flex items-center justify-center gap-2 touch-manipulation disabled:opacity-40 select-none cursor-pointer"
         >
-          ⬇️ SLIDE / TUNDUK
+          <span>⬇️ SLIDE / TUNDUK</span>
+        </button>
+        <button
+          id="btn-cyber-runner-jump"
+          onClick={jump}
+          disabled={gameState !== 'playing'}
+          className="min-h-[52px] py-3.5 bg-gradient-to-r from-cyan-600 to-blue-600 active:from-cyan-500 active:to-blue-500 text-slate-950 font-black text-sm sm:text-base border-2 border-cyan-400 rounded-2xl shadow-lg shadow-cyan-500/30 active:scale-95 transition-all flex items-center justify-center gap-2 touch-manipulation disabled:opacity-40 select-none cursor-pointer"
+        >
+          <span>⬆️ LOMPAT (2x)</span>
         </button>
       </div>
     </div>

@@ -103,6 +103,36 @@ export const NeonSnake: React.FC<NeonSnakeProps> = ({ onGameOver, onScoreUpdate 
     s.nextDir = { x: dx, y: dy };
   }, []);
 
+  const touchStartRef = useRef<{ x: number; y: number } | null>(null);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (e.touches.length > 0) {
+      touchStartRef.current = {
+        x: e.touches[0].clientX,
+        y: e.touches[0].clientY
+      };
+    }
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (!touchStartRef.current || e.changedTouches.length === 0) return;
+    const dx = e.changedTouches[0].clientX - touchStartRef.current.x;
+    const dy = e.changedTouches[0].clientY - touchStartRef.current.y;
+    const absDx = Math.abs(dx);
+    const absDy = Math.abs(dy);
+
+    if (Math.max(absDx, absDy) > 20) {
+      if (absDx > absDy) {
+        // Horizontal swipe
+        changeDirection(dx > 0 ? 1 : -1, 0);
+      } else {
+        // Vertical swipe
+        changeDirection(0, dy > 0 ? 1 : -1);
+      }
+    }
+    touchStartRef.current = null;
+  };
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (gameState !== 'playing') {
@@ -343,13 +373,15 @@ export const NeonSnake: React.FC<NeonSnakeProps> = ({ onGameOver, onScoreUpdate 
         </div>
       </div>
 
-      {/* Main Canvas */}
+      {/* Main Canvas with Swipe Controls */}
       <div className="relative w-full bg-black rounded-b-xl overflow-hidden border border-t-0 border-emerald-500/30 shadow-2xl shadow-emerald-950/40">
         <canvas
           ref={canvasRef}
           width={440}
           height={440}
-          className="w-full h-auto block"
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
+          className="w-full h-auto block touch-none cursor-pointer"
         />
 
         {/* Start / Game Over Overlay */}
@@ -360,16 +392,16 @@ export const NeonSnake: React.FC<NeonSnakeProps> = ({ onGameOver, onScoreUpdate 
                 <div className="w-14 h-14 rounded-2xl bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center mb-3 shadow-lg shadow-emerald-500/20">
                   <Play className="w-7 h-7 text-emerald-400 fill-emerald-400 translate-x-0.5" />
                 </div>
-                <h3 className="text-2xl font-black text-white tracking-wide mb-1">NEON SNAKE EVOLUTION</h3>
-                <p className="text-sm text-slate-300 max-w-xs mb-5">
-                  Makan buah neon, manfaatkan portal teleportasi, dan jangan menabrak ekormu sendiri!
+                <h3 className="text-xl sm:text-2xl font-black text-white tracking-wide mb-1">NEON SNAKE EVOLUTION</h3>
+                <p className="text-xs sm:text-sm text-slate-300 max-w-xs mb-5">
+                  Geser layar (swipe) atau gunakan D-Pad untuk makan buah neon & raih rekor!
                 </p>
                 <button
                   id="btn-snake-start"
                   onClick={startGame}
-                  className="px-7 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-bold text-base rounded-xl shadow-lg shadow-emerald-500/30 transform hover:scale-105 active:scale-95 transition-all cursor-pointer"
+                  className="px-7 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-bold text-sm sm:text-base rounded-xl shadow-lg shadow-emerald-500/30 transform hover:scale-105 active:scale-95 transition-all cursor-pointer min-h-[48px]"
                 >
-                  Mulai Main (Spasi)
+                  Mulai Main (Ketuk / Spasi)
                 </button>
               </>
             ) : (
@@ -389,7 +421,7 @@ export const NeonSnake: React.FC<NeonSnakeProps> = ({ onGameOver, onScoreUpdate 
                 <button
                   id="btn-snake-retry"
                   onClick={startGame}
-                  className="px-6 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-600 text-slate-950 font-bold text-sm rounded-xl shadow-lg shadow-emerald-500/30 flex items-center gap-2 hover:brightness-110 active:scale-95 transition-all cursor-pointer"
+                  className="px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 text-slate-950 font-bold text-sm rounded-xl shadow-lg shadow-emerald-500/30 flex items-center gap-2 hover:brightness-110 active:scale-95 transition-all cursor-pointer min-h-[48px]"
                 >
                   <RotateCcw className="w-4 h-4" /> Main Lagi
                 </button>
@@ -400,11 +432,12 @@ export const NeonSnake: React.FC<NeonSnakeProps> = ({ onGameOver, onScoreUpdate 
       </div>
 
       {/* Onscreen D-Pad Controls for Touch / Mobile */}
-      <div className="w-full mt-3 flex flex-col items-center gap-1.5 px-4 max-w-xs">
+      <div className="w-full mt-3 flex flex-col items-center gap-2 px-2 max-w-sm">
+        <div className="text-[11px] text-slate-400 font-medium">💡 Geser layar (Swipe) atau gunakan tombol:</div>
         <button
           id="btn-snake-up"
           onClick={() => changeDirection(0, -1)}
-          className="w-14 h-12 bg-slate-800 border border-emerald-500/40 rounded-xl text-emerald-300 font-bold text-lg active:bg-emerald-600/40 active:scale-95 flex items-center justify-center transition-all shadow-md touch-manipulation"
+          className="w-16 h-12 bg-slate-900/90 border-2 border-emerald-500/40 rounded-xl text-emerald-300 font-black text-xl active:bg-emerald-600/40 active:scale-95 flex items-center justify-center transition-all shadow-md touch-manipulation min-h-[48px] cursor-pointer"
         >
           ▲
         </button>
@@ -412,7 +445,7 @@ export const NeonSnake: React.FC<NeonSnakeProps> = ({ onGameOver, onScoreUpdate 
           <button
             id="btn-snake-left"
             onClick={() => changeDirection(-1, 0)}
-            className="w-14 h-12 bg-slate-800 border border-emerald-500/40 rounded-xl text-emerald-300 font-bold text-lg active:bg-emerald-600/40 active:scale-95 flex items-center justify-center transition-all shadow-md touch-manipulation"
+            className="w-16 h-12 bg-slate-900/90 border-2 border-emerald-500/40 rounded-xl text-emerald-300 font-black text-xl active:bg-emerald-600/40 active:scale-95 flex items-center justify-center transition-all shadow-md touch-manipulation min-h-[48px] cursor-pointer"
           >
             ◀
           </button>
@@ -422,14 +455,18 @@ export const NeonSnake: React.FC<NeonSnakeProps> = ({ onGameOver, onScoreUpdate 
               stateRef.current.turbo = !stateRef.current.turbo;
               setIsTurbo(stateRef.current.turbo);
             }}
-            className="w-14 h-12 bg-emerald-600/30 border border-emerald-400/60 rounded-xl text-emerald-300 font-bold text-xs active:scale-95 flex items-center justify-center transition-all shadow-md touch-manipulation"
+            className={`w-16 h-12 border-2 rounded-xl text-xs font-black active:scale-95 flex items-center justify-center transition-all shadow-md touch-manipulation min-h-[48px] cursor-pointer ${
+              isTurbo
+                ? 'bg-amber-500/30 border-amber-400 text-amber-300 animate-pulse'
+                : 'bg-emerald-950/60 border-emerald-500/60 text-emerald-300'
+            }`}
           >
-            TURBO
+            {isTurbo ? 'TURBO 🔥' : 'NORMAL'}
           </button>
           <button
             id="btn-snake-right"
             onClick={() => changeDirection(1, 0)}
-            className="w-14 h-12 bg-slate-800 border border-emerald-500/40 rounded-xl text-emerald-300 font-bold text-lg active:bg-emerald-600/40 active:scale-95 flex items-center justify-center transition-all shadow-md touch-manipulation"
+            className="w-16 h-12 bg-slate-900/90 border-2 border-emerald-500/40 rounded-xl text-emerald-300 font-black text-xl active:bg-emerald-600/40 active:scale-95 flex items-center justify-center transition-all shadow-md touch-manipulation min-h-[48px] cursor-pointer"
           >
             ▶
           </button>
@@ -437,7 +474,7 @@ export const NeonSnake: React.FC<NeonSnakeProps> = ({ onGameOver, onScoreUpdate 
         <button
           id="btn-snake-down"
           onClick={() => changeDirection(0, 1)}
-          className="w-14 h-12 bg-slate-800 border border-emerald-500/40 rounded-xl text-emerald-300 font-bold text-lg active:bg-emerald-600/40 active:scale-95 flex items-center justify-center transition-all shadow-md touch-manipulation"
+          className="w-16 h-12 bg-slate-900/90 border-2 border-emerald-500/40 rounded-xl text-emerald-300 font-black text-xl active:bg-emerald-600/40 active:scale-95 flex items-center justify-center transition-all shadow-md touch-manipulation min-h-[48px] cursor-pointer"
         >
           ▼
         </button>

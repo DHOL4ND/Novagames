@@ -8,7 +8,7 @@ const QUESTS_KEY = 'nova_arcade_quests_v1';
 export const DEFAULT_PROFILE: PlayerProfile = {
   name: 'Gamer Nova',
   avatar: 'cyber-samurai',
-  coins: 100,
+  coins: 200,
   xp: 50,
   level: 1,
   totalGamesPlayed: 0,
@@ -38,6 +38,10 @@ export function loadPlayerProfile(): PlayerProfile {
       }
       if (!profile.unlockedAvatars.includes(profile.avatar)) {
         profile.unlockedAvatars.push(profile.avatar);
+      }
+      // Give starter boost if profile has fewer than 100 coins
+      if (typeof profile.coins !== 'number' || profile.coins < 100) {
+        profile.coins = Math.max(100, Number(profile.coins) || 100);
       }
       return profile;
     }

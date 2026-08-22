@@ -275,7 +275,7 @@ export const SHOP_CHARACTERS: ShopCharacter[] = [
     title: 'Bayangan Berkecepatan Cahaya',
     icon: '🥷',
     color: 'from-emerald-500 to-teal-600',
-    price: 80,
+    price: 50,
     rarity: 'rare',
     description: 'Pakar infiltrasi grid rahasia dengan kecepatan manuver tinggi.',
     perkText: 'Gaya visual hijau neon stealth'
@@ -286,7 +286,7 @@ export const SHOP_CHARACTERS: ShopCharacter[] = [
     title: 'Unit Tempur Baja Cyber',
     icon: '🤖',
     color: 'from-amber-500 to-orange-600',
-    price: 120,
+    price: 80,
     rarity: 'rare',
     description: 'Robot bersenjatakan inti tenaga plasma dan baju zirah titanium.',
     perkText: 'Aura perisai emas berenergi'
@@ -297,8 +297,7 @@ export const SHOP_CHARACTERS: ShopCharacter[] = [
     title: 'Kapten Armada Antariksa',
     icon: '👨‍🚀',
     color: 'from-blue-500 to-indigo-600',
-    price: 180,
-    minLevel: 2,
+    price: 120,
     rarity: 'rare',
     description: 'Penjelajah gugusan bintang dengan helm augmented reality holografis.',
     perkText: 'Membuka tema visual kosmik'
@@ -309,7 +308,7 @@ export const SHOP_CHARACTERS: ShopCharacter[] = [
     title: 'Kucing Agen Rahasia',
     icon: '🐱',
     color: 'from-rose-500 to-fuchsia-600',
-    price: 220,
+    price: 150,
     rarity: 'rare',
     description: 'Kucing lincah ber-implan cybernetic dengan refleks 9 nyawa.',
     perkText: 'Aura pesona fuchsia futuristik'
@@ -320,8 +319,7 @@ export const SHOP_CHARACTERS: ShopCharacter[] = [
     title: 'Hantu Pemakan Skor',
     icon: '👻',
     color: 'from-yellow-400 to-amber-600',
-    price: 280,
-    minLevel: 3,
+    price: 200,
     rarity: 'epic',
     description: 'Makhluk glitch digital yang mampu menembus tembok matriks data.',
     perkText: 'Gaya transparan glitch unik'
@@ -332,8 +330,7 @@ export const SHOP_CHARACTERS: ShopCharacter[] = [
     title: 'Penguasa Dimensi Luar',
     icon: '👾',
     color: 'from-violet-500 to-purple-800',
-    price: 350,
-    minLevel: 4,
+    price: 250,
     rarity: 'epic',
     description: 'Bos penjaga gerbang arkade dengan kekuatan telekinesis kosmik.',
     perkText: 'Mahkota hologram ungu raja arkade'
@@ -344,8 +341,7 @@ export const SHOP_CHARACTERS: ShopCharacter[] = [
     title: 'Naga Purba Cybernetic',
     icon: '🐉',
     color: 'from-red-500 via-amber-500 to-yellow-400',
-    price: 450,
-    minLevel: 5,
+    price: 350,
     rarity: 'epic',
     description: 'Naga legendaris pemuntah laser berkekuatan mega-gigawatt.',
     perkText: 'Aura api naga emas membara'
@@ -356,8 +352,7 @@ export const SHOP_CHARACTERS: ShopCharacter[] = [
     title: 'Pelindung Singgasana Cyber',
     icon: '🧝‍♀️',
     color: 'from-cyan-400 via-teal-400 to-emerald-500',
-    price: 550,
-    minLevel: 6,
+    price: 450,
     rarity: 'legendary',
     description: 'Prajurit abadi beroda sayap kuantum dan pedang spektrum pelangi.',
     perkText: 'Efek kilau cyan murni'
@@ -368,8 +363,7 @@ export const SHOP_CHARACTERS: ShopCharacter[] = [
     title: 'Hacker Gelap Super-AI',
     icon: '👑',
     color: 'from-zinc-800 via-slate-900 to-amber-400',
-    price: 750,
-    minLevel: 8,
+    price: 600,
     rarity: 'legendary',
     description: 'Entitas kecerdasan buatan tertinggi yang menguasai seluruh dunia Nova Arcade.',
     perkText: 'Gelar Eksklusif Penguasa Nova'
@@ -380,8 +374,7 @@ export const SHOP_CHARACTERS: ShopCharacter[] = [
     title: 'Dewa Ruang & Waktu',
     icon: '⚡',
     color: 'from-yellow-300 via-orange-500 to-purple-600',
-    price: 1000,
-    minLevel: 10,
+    price: 800,
     rarity: 'legendary',
     description: 'Karakter paling langka pembawa takdir rekor tertinggi antargalaksi.',
     perkText: 'Efek kilat abadi & Penguasa Skor'

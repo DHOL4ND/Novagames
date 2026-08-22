@@ -14,6 +14,8 @@ export const SpaceStrike: React.FC<SpaceStrikeProps> = ({ onGameOver, onScoreUpd
   const [coins, setCoins] = useState(0);
   const [lives, setLives] = useState(3);
   const [weaponLevel, setWeaponLevel] = useState(1);
+  const [autoFire, setAutoFire] = useState(true);
+  const isPointerDownRef = useRef(false);
 
   const stateRef = useRef({
     player: {
@@ -29,6 +31,7 @@ export const SpaceStrike: React.FC<SpaceStrikeProps> = ({ onGameOver, onScoreUpd
       weaponLevel: 1,
       fireCooldown: 0
     },
+    autoFire: true,
     bullets: [] as { x: number; y: number; vx: number; vy: number; color: string; damage: number }[],
     enemyBullets: [] as { x: number; y: number; vx: number; vy: number; color: string }[],
     enemies: [] as {
@@ -171,6 +174,27 @@ export const SpaceStrike: React.FC<SpaceStrikeProps> = ({ onGameOver, onScoreUpd
     stateRef.current.player.y = Math.max(50, Math.min(canvas.height - stateRef.current.player.h - 10, clientY - stateRef.current.player.h / 2));
   };
 
+  const handlePointerDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    if (gameState !== 'playing') return;
+    try {
+      e.currentTarget.setPointerCapture(e.pointerId);
+    } catch {
+      // ignore
+    }
+    isPointerDownRef.current = true;
+    handlePointerMove(e);
+    shoot();
+  };
+
+  const handlePointerUp = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    try {
+      e.currentTarget.releasePointerCapture(e.pointerId);
+    } catch {
+      // ignore
+    }
+    isPointerDownRef.current = false;
+  };
+
   useEffect(() => {
     let animId: number;
     const canvas = canvasRef.current;
@@ -196,8 +220,8 @@ export const SpaceStrike: React.FC<SpaceStrikeProps> = ({ onGameOver, onScoreUpd
         if (s.player.fireCooldown > 0) s.player.fireCooldown--;
         if (s.player.invulnerable > 0) s.player.invulnerable--;
 
-        // Auto continuous fire when holding space
-        if (s.keys.fire && s.player.fireCooldown === 0) {
+        // Continuous auto-fire or touch holding
+        if ((s.autoFire || s.keys.fire || isPointerDownRef.current) && s.player.fireCooldown === 0) {
           shoot();
         }
 
@@ -593,16 +617,16 @@ export const SpaceStrike: React.FC<SpaceStrikeProps> = ({ onGameOver, onScoreUpd
         </div>
       </div>
 
-      {/* Main Canvas */}
+      {/* Main Canvas with Enhanced Touch Tracking */}
       <div className="relative w-full bg-black rounded-b-xl overflow-hidden border border-t-0 border-pink-500/30 shadow-2xl shadow-purple-950/40">
         <canvas
           ref={canvasRef}
           width={450}
           height={480}
+          onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
-          onPointerDown={() => {
-            if (gameState === 'playing') shoot();
-          }}
+          onPointerUp={handlePointerUp}
+          onPointerCancel={handlePointerUp}
           className="w-full h-auto block touch-none cursor-crosshair"
         />
 
@@ -614,16 +638,16 @@ export const SpaceStrike: React.FC<SpaceStrikeProps> = ({ onGameOver, onScoreUpd
                 <div className="w-14 h-14 rounded-2xl bg-pink-500/20 border border-pink-400/40 flex items-center justify-center mb-3 shadow-lg shadow-pink-500/20">
                   <Play className="w-7 h-7 text-pink-400 fill-pink-400 translate-x-0.5" />
                 </div>
-                <h3 className="text-2xl font-black text-white tracking-wide mb-1">GALAXY STRIKE 3000</h3>
-                <p className="text-sm text-slate-300 max-w-xs mb-5">
-                  Tembak pesawat alien, hindari laser, dan kumpulkan upgrade senjata!
+                <h3 className="text-xl sm:text-2xl font-black text-white tracking-wide mb-1">GALAXY STRIKE 3000</h3>
+                <p className="text-xs sm:text-sm text-slate-300 max-w-xs mb-5">
+                  Geser jari di layar untuk manuver pesawat, hindari laser musuh & kumpulkan upgrade!
                 </p>
                 <button
                   id="btn-space-strike-start"
                   onClick={startGame}
-                  className="px-7 py-3 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-400 hover:to-purple-500 text-white font-bold text-base rounded-xl shadow-lg shadow-pink-500/30 transform hover:scale-105 active:scale-95 transition-all cursor-pointer"
+                  className="px-7 py-3 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-400 hover:to-purple-500 text-white font-bold text-sm sm:text-base rounded-xl shadow-lg shadow-pink-500/30 transform hover:scale-105 active:scale-95 transition-all cursor-pointer min-h-[48px]"
                 >
-                  Luncurkan Pesawat (Spasi)
+                  Luncurkan Pesawat (Ketuk / Spasi)
                 </button>
               </>
             ) : (
@@ -643,7 +667,7 @@ export const SpaceStrike: React.FC<SpaceStrikeProps> = ({ onGameOver, onScoreUpd
                 <button
                   id="btn-space-strike-retry"
                   onClick={startGame}
-                  className="px-6 py-2.5 bg-gradient-to-r from-pink-500 to-purple-600 text-white font-bold text-sm rounded-xl shadow-lg shadow-pink-500/30 flex items-center gap-2 hover:brightness-110 active:scale-95 transition-all cursor-pointer"
+                  className="px-6 py-3 bg-gradient-to-r from-pink-500 to-purple-600 text-white font-bold text-sm rounded-xl shadow-lg shadow-pink-500/30 flex items-center gap-2 hover:brightness-110 active:scale-95 transition-all cursor-pointer min-h-[48px]"
                 >
                   <RotateCcw className="w-4 h-4" /> Ulangi Misi
                 </button>
@@ -653,16 +677,57 @@ export const SpaceStrike: React.FC<SpaceStrikeProps> = ({ onGameOver, onScoreUpd
         )}
       </div>
 
-      {/* Touch Action Controls */}
-      <div className="w-full mt-3 flex items-center justify-center gap-3 px-2">
-        <button
-          id="btn-space-shoot-touch"
-          onClick={shoot}
-          disabled={gameState !== 'playing'}
-          className="w-full py-3.5 bg-gradient-to-r from-pink-600 to-purple-600 active:from-pink-700 active:to-purple-700 rounded-xl text-white font-bold text-sm shadow-md active:scale-95 transition-all flex items-center justify-center gap-2 touch-manipulation disabled:opacity-40"
-        >
-          🚀 TEMBAK LASER (Spasi / Tap)
-        </button>
+      {/* Mobile Controls & Auto-Fire Toggle */}
+      <div className="w-full mt-3 flex flex-col gap-2 px-1">
+        <div className="flex items-center gap-2">
+          <button
+            id="btn-space-autofire"
+            onClick={() => {
+              const next = !autoFire;
+              setAutoFire(next);
+              stateRef.current.autoFire = next;
+            }}
+            className={`flex-1 py-2.5 px-3 rounded-xl border text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer min-h-[44px] ${
+              autoFire
+                ? 'bg-amber-500/20 border-amber-400 text-amber-300 shadow-sm shadow-amber-500/20'
+                : 'bg-slate-800/60 border-slate-700 text-slate-400'
+            }`}
+          >
+            <Zap className="w-4 h-4" />
+            <span>Auto Tembak: {autoFire ? 'ON ⚡' : 'OFF'}</span>
+          </button>
+
+          <button
+            id="btn-space-shoot-touch"
+            onClick={shoot}
+            disabled={gameState !== 'playing'}
+            className="flex-1 py-2.5 px-3 bg-gradient-to-r from-pink-600 to-purple-600 active:from-pink-700 active:to-purple-700 rounded-xl text-white font-bold text-xs sm:text-sm shadow-md active:scale-95 transition-all flex items-center justify-center gap-1.5 touch-manipulation disabled:opacity-40 min-h-[44px] cursor-pointer"
+          >
+            <span>🚀 Laser Turbo</span>
+          </button>
+        </div>
+
+        {/* Dual Thumb Directional Steer Buttons */}
+        <div className="grid grid-cols-2 gap-2 sm:hidden">
+          <button
+            onPointerDown={() => { stateRef.current.keys.left = true; }}
+            onPointerUp={() => { stateRef.current.keys.left = false; }}
+            onPointerCancel={() => { stateRef.current.keys.left = false; }}
+            disabled={gameState !== 'playing'}
+            className="py-3 bg-slate-900/80 active:bg-slate-700 border border-slate-700/60 rounded-xl text-slate-200 font-bold text-sm flex items-center justify-center gap-1 select-none min-h-[48px] disabled:opacity-40"
+          >
+            <span>⬅️ Geser Kiri</span>
+          </button>
+          <button
+            onPointerDown={() => { stateRef.current.keys.right = true; }}
+            onPointerUp={() => { stateRef.current.keys.right = false; }}
+            onPointerCancel={() => { stateRef.current.keys.right = false; }}
+            disabled={gameState !== 'playing'}
+            className="py-3 bg-slate-900/80 active:bg-slate-700 border border-slate-700/60 rounded-xl text-slate-200 font-bold text-sm flex items-center justify-center gap-1 select-none min-h-[48px] disabled:opacity-40"
+          >
+            <span>Geser Kanan ➡️</span>
+          </button>
+        </div>
       </div>
     </div>
   );

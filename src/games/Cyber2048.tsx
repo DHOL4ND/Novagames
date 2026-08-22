@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { sound } from '../utils/audio';
 import { RotateCcw, Sparkles, Undo2 } from 'lucide-react';
 
@@ -258,10 +258,38 @@ export const Cyber2048: React.FC<Cyber2048Props> = ({ onGameOver, onScoreUpdate 
     }
   };
 
+  const touchStartRef = useRef<{ x: number; y: number } | null>(null);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (e.touches.length > 0) {
+      touchStartRef.current = {
+        x: e.touches[0].clientX,
+        y: e.touches[0].clientY
+      };
+    }
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (!touchStartRef.current || e.changedTouches.length === 0) return;
+    const dx = e.changedTouches[0].clientX - touchStartRef.current.x;
+    const dy = e.changedTouches[0].clientY - touchStartRef.current.y;
+    const absDx = Math.abs(dx);
+    const absDy = Math.abs(dy);
+
+    if (Math.max(absDx, absDy) > 25) {
+      if (absDx > absDy) {
+        move(dx > 0 ? 'right' : 'left');
+      } else {
+        move(dy > 0 ? 'down' : 'up');
+      }
+    }
+    touchStartRef.current = null;
+  };
+
   return (
     <div className="relative w-full max-w-sm mx-auto flex flex-col items-center select-none">
       {/* Top HUD */}
-      <div className="w-full flex items-center justify-between px-3 py-2 bg-slate-900/80 border border-indigo-500/30 rounded-t-xl backdrop-blur-md">
+      <div className="w-full flex items-center justify-between px-3 py-2.5 bg-slate-900/80 border border-indigo-500/30 rounded-t-xl backdrop-blur-md">
         <div className="flex items-center gap-3">
           <div className="text-indigo-300 font-mono font-bold text-base">
             Skor: {score}
@@ -275,23 +303,27 @@ export const Cyber2048: React.FC<Cyber2048Props> = ({ onGameOver, onScoreUpdate 
             id="btn-2048-undo"
             onClick={undo}
             disabled={!history}
-            className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 disabled:opacity-30 rounded-lg text-xs font-semibold text-indigo-300 flex items-center gap-1 border border-indigo-500/30 transition-all cursor-pointer"
+            className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 disabled:opacity-30 rounded-lg text-xs font-semibold text-indigo-300 flex items-center gap-1 border border-indigo-500/30 transition-all cursor-pointer min-h-[36px]"
           >
             <Undo2 className="w-3.5 h-3.5" /> Undo
           </button>
           <button
             id="btn-2048-restart"
             onClick={initGame}
-            className="p-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg text-slate-300 border border-slate-700 transition-all cursor-pointer"
+            className="p-2 bg-slate-800 hover:bg-slate-700 rounded-lg text-slate-300 border border-slate-700 transition-all cursor-pointer min-h-[36px] min-w-[36px] flex items-center justify-center"
             title="Mulai Ulang"
           >
-            <RotateCcw className="w-3.5 h-3.5" />
+            <RotateCcw className="w-4 h-4" />
           </button>
         </div>
       </div>
 
-      {/* Grid Container */}
-      <div className="relative w-full aspect-square bg-slate-950 p-3 rounded-b-xl border border-t-0 border-indigo-500/30 grid grid-cols-4 gap-2.5 shadow-2xl shadow-indigo-950/50">
+      {/* Grid Container with Touch Swiping */}
+      <div
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+        className="relative w-full aspect-square bg-slate-950 p-3 rounded-b-xl border border-t-0 border-indigo-500/30 grid grid-cols-4 gap-2.5 shadow-2xl shadow-indigo-950/50 touch-none cursor-pointer"
+      >
         {board.map((row, r) =>
           row.map((val, c) => (
             <div
@@ -319,14 +351,14 @@ export const Cyber2048: React.FC<Cyber2048Props> = ({ onGameOver, onScoreUpdate 
                   <button
                     id="btn-2048-continue"
                     onClick={() => setWon(false)}
-                    className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl cursor-pointer"
+                    className="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl cursor-pointer min-h-[44px]"
                   >
                     Lanjut Main
                   </button>
                   <button
                     id="btn-2048-newgame"
                     onClick={initGame}
-                    className="px-4 py-2 bg-slate-800 text-slate-300 font-bold text-xs rounded-xl cursor-pointer"
+                    className="px-4 py-2.5 bg-slate-800 text-slate-300 font-bold text-xs rounded-xl cursor-pointer min-h-[44px]"
                   >
                     Game Baru
                   </button>
@@ -340,7 +372,7 @@ export const Cyber2048: React.FC<Cyber2048Props> = ({ onGameOver, onScoreUpdate 
                 <button
                   id="btn-2048-retry"
                   onClick={initGame}
-                  className="px-6 py-2.5 bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-bold text-sm rounded-xl shadow-lg shadow-indigo-500/30 flex items-center gap-2 hover:brightness-110 active:scale-95 transition-all cursor-pointer"
+                  className="px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-bold text-sm rounded-xl shadow-lg shadow-indigo-500/30 flex items-center gap-2 hover:brightness-110 active:scale-95 transition-all cursor-pointer min-h-[48px]"
                 >
                   <RotateCcw className="w-4 h-4" /> Coba Lagi
                 </button>
@@ -351,33 +383,34 @@ export const Cyber2048: React.FC<Cyber2048Props> = ({ onGameOver, onScoreUpdate 
       </div>
 
       {/* Onscreen Swipe / Directional Control Pad */}
-      <div className="w-full mt-3 flex flex-col items-center gap-1.5 px-4">
+      <div className="w-full mt-3 flex flex-col items-center gap-2 px-2">
+        <div className="text-[11px] text-slate-400 font-medium">💡 Geser jari pada kotak angka (Swipe) atau klik arah:</div>
         <button
           id="btn-2048-up"
           onClick={() => move('up')}
-          className="w-14 h-11 bg-slate-800 border border-indigo-500/40 rounded-xl text-indigo-300 font-bold text-lg active:scale-95 flex items-center justify-center shadow-md touch-manipulation"
+          className="w-16 h-12 bg-slate-900/90 border-2 border-indigo-500/40 rounded-xl text-indigo-300 font-black text-xl active:scale-95 flex items-center justify-center shadow-md touch-manipulation min-h-[48px] cursor-pointer"
         >
           ▲
         </button>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
           <button
             id="btn-2048-left"
             onClick={() => move('left')}
-            className="w-14 h-11 bg-slate-800 border border-indigo-500/40 rounded-xl text-indigo-300 font-bold text-lg active:scale-95 flex items-center justify-center shadow-md touch-manipulation"
+            className="w-16 h-12 bg-slate-900/90 border-2 border-indigo-500/40 rounded-xl text-indigo-300 font-black text-xl active:scale-95 flex items-center justify-center shadow-md touch-manipulation min-h-[48px] cursor-pointer"
           >
             ◀
           </button>
           <button
             id="btn-2048-down"
             onClick={() => move('down')}
-            className="w-14 h-11 bg-slate-800 border border-indigo-500/40 rounded-xl text-indigo-300 font-bold text-lg active:scale-95 flex items-center justify-center shadow-md touch-manipulation"
+            className="w-16 h-12 bg-slate-900/90 border-2 border-indigo-500/40 rounded-xl text-indigo-300 font-black text-xl active:scale-95 flex items-center justify-center shadow-md touch-manipulation min-h-[48px] cursor-pointer"
           >
             ▼
           </button>
           <button
             id="btn-2048-right"
             onClick={() => move('right')}
-            className="w-14 h-11 bg-slate-800 border border-indigo-500/40 rounded-xl text-indigo-300 font-bold text-lg active:scale-95 flex items-center justify-center shadow-md touch-manipulation"
+            className="w-16 h-12 bg-slate-900/90 border-2 border-indigo-500/40 rounded-xl text-indigo-300 font-black text-xl active:scale-95 flex items-center justify-center shadow-md touch-manipulation min-h-[48px] cursor-pointer"
           >
             ▶
           </button>

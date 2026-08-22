@@ -151,6 +151,16 @@ export const BlockBreaker: React.FC<BlockBreakerProps> = ({ onGameOver, onScoreU
     };
   }, [gameState]);
 
+  const handlePointerDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    if (gameState !== 'playing') return;
+    try {
+      e.currentTarget.setPointerCapture(e.pointerId);
+    } catch {
+      // ignore
+    }
+    handlePointerMove(e);
+  };
+
   const handlePointerMove = (e: React.PointerEvent<HTMLCanvasElement>) => {
     if (gameState !== 'playing') return;
     const canvas = canvasRef.current;
@@ -159,6 +169,14 @@ export const BlockBreaker: React.FC<BlockBreakerProps> = ({ onGameOver, onScoreU
     const scaleX = canvas.width / rect.width;
     const clientX = (e.clientX - rect.left) * scaleX;
     stateRef.current.paddle.x = Math.max(10, Math.min(canvas.width - stateRef.current.paddle.w - 10, clientX - stateRef.current.paddle.w / 2));
+  };
+
+  const handlePointerUp = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    try {
+      e.currentTarget.releasePointerCapture(e.pointerId);
+    } catch {
+      // ignore
+    }
   };
 
   useEffect(() => {
@@ -542,7 +560,10 @@ export const BlockBreaker: React.FC<BlockBreakerProps> = ({ onGameOver, onScoreU
           ref={canvasRef}
           width={480}
           height={480}
+          onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
+          onPointerUp={handlePointerUp}
+          onPointerCancel={handlePointerUp}
           className="w-full h-auto block touch-none cursor-ew-resize"
         />
 
@@ -554,16 +575,16 @@ export const BlockBreaker: React.FC<BlockBreakerProps> = ({ onGameOver, onScoreU
                 <div className="w-14 h-14 rounded-2xl bg-amber-500/20 border border-amber-400/40 flex items-center justify-center mb-3 shadow-lg shadow-amber-500/20">
                   <Play className="w-7 h-7 text-amber-400 fill-amber-400 translate-x-0.5" />
                 </div>
-                <h3 className="text-2xl font-black text-white tracking-wide mb-1">HYPER BLOCK NEO</h3>
-                <p className="text-sm text-slate-300 max-w-xs mb-5">
-                  Pantulkan bola untuk menghancurkan seluruh balok neon!
+                <h3 className="text-xl sm:text-2xl font-black text-white tracking-wide mb-1">HYPER BLOCK NEO</h3>
+                <p className="text-xs sm:text-sm text-slate-300 max-w-xs mb-5">
+                  Geser paddle untuk memantulkan bola dan hancurkan seluruh balok neon!
                 </p>
                 <button
                   id="btn-block-breaker-start"
                   onClick={startGame}
-                  className="px-7 py-3 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-slate-950 font-bold text-base rounded-xl shadow-lg shadow-amber-500/30 transform hover:scale-105 active:scale-95 transition-all cursor-pointer"
+                  className="px-7 py-3 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-slate-950 font-bold text-sm sm:text-base rounded-xl shadow-lg shadow-amber-500/30 transform hover:scale-105 active:scale-95 transition-all cursor-pointer min-h-[48px]"
                 >
-                  Mulai Main (Spasi)
+                  Mulai Main (Ketuk / Spasi)
                 </button>
               </>
             ) : gameState === 'won' ? (
@@ -574,7 +595,7 @@ export const BlockBreaker: React.FC<BlockBreakerProps> = ({ onGameOver, onScoreU
                 <button
                   id="btn-block-breaker-next"
                   onClick={startGame}
-                  className="px-6 py-2.5 bg-gradient-to-r from-amber-500 to-orange-600 text-slate-950 font-bold text-sm rounded-xl shadow-lg shadow-amber-500/30 flex items-center gap-2 hover:brightness-110 active:scale-95 transition-all cursor-pointer"
+                  className="px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-600 text-slate-950 font-bold text-sm rounded-xl shadow-lg shadow-amber-500/30 flex items-center gap-2 hover:brightness-110 active:scale-95 transition-all cursor-pointer min-h-[48px]"
                 >
                   <RotateCcw className="w-4 h-4" /> Main Lagi
                 </button>
@@ -596,7 +617,7 @@ export const BlockBreaker: React.FC<BlockBreakerProps> = ({ onGameOver, onScoreU
                 <button
                   id="btn-block-breaker-retry"
                   onClick={startGame}
-                  className="px-6 py-2.5 bg-gradient-to-r from-amber-500 to-orange-600 text-slate-950 font-bold text-sm rounded-xl shadow-lg shadow-amber-500/30 flex items-center gap-2 hover:brightness-110 active:scale-95 transition-all cursor-pointer"
+                  className="px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-600 text-slate-950 font-bold text-sm rounded-xl shadow-lg shadow-amber-500/30 flex items-center gap-2 hover:brightness-110 active:scale-95 transition-all cursor-pointer min-h-[48px]"
                 >
                   <RotateCcw className="w-4 h-4" /> Coba Lagi
                 </button>
@@ -606,8 +627,31 @@ export const BlockBreaker: React.FC<BlockBreakerProps> = ({ onGameOver, onScoreU
         )}
       </div>
 
-      <div className="w-full text-center mt-2 text-xs text-slate-400">
-        💡 Gerakkan mouse atau sentuh layar ke kiri & kanan untuk mengontrol paddle
+      {/* Dual Touch Buttons for Mobile Steer */}
+      <div className="w-full mt-3 flex flex-col gap-2 px-1">
+        <div className="text-center text-xs text-slate-400">
+          💡 Geser layar langsung dengan jari, atau tekan tombol arah:
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <button
+            onPointerDown={() => { stateRef.current.keys.left = true; }}
+            onPointerUp={() => { stateRef.current.keys.left = false; }}
+            onPointerCancel={() => { stateRef.current.keys.left = false; }}
+            disabled={gameState !== 'playing'}
+            className="py-3.5 bg-slate-900/90 active:bg-amber-500/30 border-2 border-amber-500/40 rounded-xl text-amber-300 font-black text-base flex items-center justify-center gap-2 select-none min-h-[50px] disabled:opacity-40 cursor-pointer"
+          >
+            <span>◀ Geser Kiri</span>
+          </button>
+          <button
+            onPointerDown={() => { stateRef.current.keys.right = true; }}
+            onPointerUp={() => { stateRef.current.keys.right = false; }}
+            onPointerCancel={() => { stateRef.current.keys.right = false; }}
+            disabled={gameState !== 'playing'}
+            className="py-3.5 bg-slate-900/90 active:bg-amber-500/30 border-2 border-amber-500/40 rounded-xl text-amber-300 font-black text-base flex items-center justify-center gap-2 select-none min-h-[50px] disabled:opacity-40 cursor-pointer"
+          >
+            <span>Geser Kanan ▶</span>
+          </button>
+        </div>
       </div>
     </div>
   );
