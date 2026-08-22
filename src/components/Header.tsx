@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { PlayerProfile, DailyQuest } from '../types';
 import { sound } from '../utils/audio';
 import { AVATAR_LIST } from '../data/games';
-import { Coins, Dices, Flame, Gamepad2, Gift, Search, ShoppingBag, Sparkles, User, Volume2, VolumeX } from 'lucide-react';
+import { Coins, Dices, Edit3, Flame, Gamepad2, Gift, Search, ShoppingBag, Sparkles, Trophy, User, Volume2, VolumeX } from 'lucide-react';
 
 interface HeaderProps {
   profile: PlayerProfile;
@@ -13,6 +13,8 @@ interface HeaderProps {
   onOpenQuests: () => void;
   onOpenRandom: () => void;
   onOpenShop: () => void;
+  onOpenLeaderboard: () => void;
+  onOpenNickname: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -23,7 +25,9 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenProfile,
   onOpenQuests,
   onOpenRandom,
-  onOpenShop
+  onOpenShop,
+  onOpenLeaderboard,
+  onOpenNickname
 }) => {
   const [muted, setMuted] = useState(sound.getMuted());
   const [volume, setVolume] = useState(sound.getVolume());
@@ -73,18 +77,30 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
           </div>
 
-          {/* Mobile Actions: Shop, Sound & Profile */}
-          <div className="flex md:hidden items-center gap-2">
+          {/* Mobile Actions: Leaderboard, Shop, Sound & Profile */}
+          <div className="flex md:hidden items-center gap-1.5">
+            <button
+              id="btn-leaderboard-mobile"
+              onClick={() => {
+                sound.playClick();
+                onOpenLeaderboard();
+              }}
+              className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-300 text-xs font-bold"
+              title="Papan Skor & Level"
+            >
+              <Trophy className="w-3.5 h-3.5 text-amber-400" />
+              <span>Peringkat</span>
+            </button>
             <button
               id="btn-shop-mobile"
               onClick={() => {
                 sound.playClick();
                 onOpenShop();
               }}
-              className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-300 text-xs font-bold"
+              className="p-2 rounded-xl bg-slate-800/50 border border-slate-700/50 text-amber-300 hover:bg-slate-800"
+              title="Toko Karakter"
             >
-              <ShoppingBag className="w-3.5 h-3.5" />
-              <span>Toko</span>
+              <ShoppingBag className="w-4 h-4" />
             </button>
             <button
               id="btn-sound-mobile"
@@ -96,10 +112,10 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               id="btn-profile-mobile"
               onClick={onOpenProfile}
-              className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-800/50 border border-slate-700/50 text-xs text-white"
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-800/50 border border-slate-700/50 text-xs text-white"
             >
               <span>{activeAvatar.icon}</span>
-              <span className="font-bold text-amber-400 font-mono">{profile.coins} 🪙</span>
+              <span className="font-bold text-amber-400 font-mono">Lv.{profile.level}</span>
             </button>
           </div>
         </div>
@@ -127,6 +143,19 @@ export const Header: React.FC<HeaderProps> = ({
 
         {/* Action Hub & Profile (Desktop) */}
         <div className="hidden md:flex items-center gap-2.5">
+          {/* Leaderboard Button */}
+          <button
+            id="btn-leaderboard-header"
+            onClick={() => {
+              sound.playClick();
+              onOpenLeaderboard();
+            }}
+            className="px-3.5 py-1.5 rounded-full bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-300 hover:text-amber-200 text-xs font-semibold flex items-center gap-1.5 transition-all transform hover:scale-105 active:scale-95 cursor-pointer shadow-sm shadow-amber-500/10"
+          >
+            <Trophy className="w-3.5 h-3.5 text-amber-400" />
+            <span>Papan Peringkat</span>
+          </button>
+
           {/* Shop Button */}
           <button
             id="btn-shop"
@@ -134,10 +163,10 @@ export const Header: React.FC<HeaderProps> = ({
               sound.playClick();
               onOpenShop();
             }}
-            className="px-3.5 py-1.5 rounded-full bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-300 hover:text-amber-200 text-xs font-semibold flex items-center gap-1.5 transition-all transform hover:scale-105 active:scale-95 cursor-pointer shadow-sm shadow-amber-500/10"
+            className="px-3.5 py-1.5 rounded-full bg-slate-800/50 hover:bg-slate-800 border border-slate-700/50 hover:border-amber-500/40 text-amber-300 hover:text-amber-200 text-xs font-semibold flex items-center gap-1.5 transition-all transform hover:scale-105 active:scale-95 cursor-pointer"
           >
             <ShoppingBag className="w-3.5 h-3.5 text-amber-400" />
-            <span>Toko Karakter</span>
+            <span>Toko</span>
           </button>
 
           {/* Spin Random Game Button */}
@@ -150,7 +179,7 @@ export const Header: React.FC<HeaderProps> = ({
             className="px-3.5 py-1.5 rounded-full bg-indigo-500/15 hover:bg-indigo-500/25 border border-indigo-500/40 text-indigo-200 text-xs font-semibold flex items-center gap-1.5 transition-all transform hover:scale-105 active:scale-95 cursor-pointer shadow-sm"
           >
             <Dices className="w-3.5 h-3.5 text-indigo-400 animate-spin" style={{ animationDuration: '6s' }} />
-            <span>Pilih Acak</span>
+            <span>Acak</span>
           </button>
 
           {/* Daily Quests Button */}
@@ -202,33 +231,46 @@ export const Header: React.FC<HeaderProps> = ({
             )}
           </div>
 
-          {/* Player Profile Quick View */}
-          <button
-            id="btn-player-profile"
-            onClick={() => {
-              sound.playClick();
-              onOpenProfile();
-            }}
-            className="flex items-center gap-2.5 pl-2.5 pr-3.5 py-1.5 rounded-full bg-slate-800/40 hover:bg-slate-800/70 border border-slate-700/50 hover:border-indigo-500/40 transition-all cursor-pointer group"
-          >
-            <div className={`w-7 h-7 rounded-full bg-gradient-to-br ${activeAvatar.color} flex items-center justify-center text-sm shadow-md`}>
-              {activeAvatar.icon}
-            </div>
-            <div className="text-left">
-              <div className="flex items-center gap-1.5 leading-none mb-0.5">
-                <span className="text-xs font-semibold text-slate-200 group-hover:text-white transition-colors">
-                  {profile.name}
-                </span>
-                <span className="text-[9px] font-bold px-1.5 py-0.2 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
-                  Lv.{profile.level}
-                </span>
+          {/* Player Nickname & Profile Quick View */}
+          <div className="flex items-center gap-1 bg-slate-800/40 hover:bg-slate-800/70 border border-slate-700/50 hover:border-indigo-500/40 rounded-full pl-2 pr-3 py-1 transition-all">
+            <button
+              id="btn-player-profile"
+              onClick={() => {
+                sound.playClick();
+                onOpenProfile();
+              }}
+              className="flex items-center gap-2 text-left cursor-pointer group"
+            >
+              <div className={`w-7 h-7 rounded-full bg-gradient-to-br ${activeAvatar.color} flex items-center justify-center text-sm shadow-md`}>
+                {activeAvatar.icon}
               </div>
-              <div className="flex items-center gap-2 text-[10px] font-mono text-amber-400 font-bold leading-none">
-                <span className="flex items-center gap-0.5">🪙 {profile.coins}</span>
-                <span className="text-slate-400 font-sans text-[10px]">✨ {profile.xp % 200}/200 XP</span>
+              <div>
+                <div className="flex items-center gap-1.5 leading-none mb-0.5">
+                  <span className="text-xs font-semibold text-slate-200 group-hover:text-white transition-colors max-w-[110px] truncate">
+                    {profile.name}
+                  </span>
+                  <span className="text-[9px] font-bold px-1.5 py-0.2 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                    Lv.{profile.level}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 text-[10px] font-mono text-amber-400 font-bold leading-none">
+                  <span className="flex items-center gap-0.5">🪙 {profile.coins}</span>
+                  <span className="text-slate-400 font-sans text-[10px]">✨ {profile.xp % 200}/200 XP</span>
+                </div>
               </div>
-            </div>
-          </button>
+            </button>
+            <button
+              id="btn-quick-edit-nickname"
+              onClick={() => {
+                sound.playClick();
+                onOpenNickname();
+              }}
+              className="p-1 text-slate-400 hover:text-indigo-300 transition-colors ml-1 cursor-pointer"
+              title="Ganti Nickname"
+            >
+              <Edit3 className="w-3 h-3" />
+            </button>
+          </div>
         </div>
       </div>
     </header>

@@ -9,6 +9,7 @@ import {
   updateGameResults,
   fireCelebrationConfetti
 } from './utils/storage';
+import { getSortedLevelLeaderboard } from './data/leaderboardData';
 import { sound } from './utils/audio';
 import { Header } from './components/Header';
 import { GameCard } from './components/GameCard';
@@ -17,21 +18,27 @@ import { ProfileModal } from './components/ProfileModal';
 import { QuestsModal } from './components/QuestsModal';
 import { RandomGameModal } from './components/RandomGameModal';
 import { ShopModal } from './components/ShopModal';
+import { LeaderboardModal } from './components/LeaderboardModal';
+import { NicknameModal } from './components/NicknameModal';
 import {
   Award,
   ChevronRight,
   Compass,
+  Crown,
   Dices,
+  Edit3,
   Flame,
   Gamepad2,
   Heart,
   Layers,
+  Medal,
   Play,
   Rocket,
   Search,
   ShoppingBag,
   Sparkles,
   Trophy,
+  User,
   Zap
 } from 'lucide-react';
 
@@ -56,6 +63,8 @@ export default function App() {
   const [showQuestsModal, setShowQuestsModal] = useState(false);
   const [showRandomModal, setShowRandomModal] = useState(false);
   const [showShopModal, setShowShopModal] = useState(false);
+  const [showLeaderboardModal, setShowLeaderboardModal] = useState(false);
+  const [showNicknameModal, setShowNicknameModal] = useState(false);
 
   // Notifications / Toast
   const [toastMessage, setToastMessage] = useState<{ title: string; desc: string; icon: string } | null>(null);
@@ -78,6 +87,21 @@ export default function App() {
   useEffect(() => {
     saveQuests(quests);
   }, [quests]);
+
+  const handleUpdateNickname = (newName: string) => {
+    setProfile(prev => ({
+      ...prev,
+      name: newName
+    }));
+    setToastMessage({
+      title: 'NICKNAME DIPERBARUI! ✨',
+      desc: `Nickname berhasil diubah menjadi "${newName}"`,
+      icon: '👤'
+    });
+  };
+
+  // Compute live ranking for quick display in Hero
+  const { playerRank } = useMemo(() => getSortedLevelLeaderboard(profile), [profile]);
 
   const handleToggleFavorite = (gameId: string) => {
     const isFav = profile.favorites.includes(gameId);
@@ -219,6 +243,8 @@ export default function App() {
         onOpenQuests={() => setShowQuestsModal(true)}
         onOpenRandom={() => setShowRandomModal(true)}
         onOpenShop={() => setShowShopModal(true)}
+        onOpenLeaderboard={() => setShowLeaderboardModal(true)}
+        onOpenNickname={() => setShowNicknameModal(true)}
       />
 
       {/* Main Hub Content */}
@@ -244,7 +270,7 @@ export default function App() {
 
               <p className="text-sm md:text-base text-slate-400 mt-3 leading-relaxed">
                 Nikmati 8+ game arkade seru mulai dari Cyber Runner, Galaxy Strike, Breakout, hingga
-                2048 dengan efek audio retro 8-bit, sistem level & papan skor!
+                2048 dengan efek audio retro 8-bit, sistem level & papan peringkat global!
               </p>
 
               {/* Quick Actions in Hero */}
@@ -255,7 +281,19 @@ export default function App() {
                   className="px-6 py-3.5 bg-gradient-to-r from-indigo-500 to-cyan-400 hover:from-indigo-400 hover:to-cyan-300 text-slate-950 font-bold text-sm rounded-full shadow-lg shadow-indigo-500/25 flex items-center gap-2 transform hover:scale-105 active:scale-95 transition-all cursor-pointer"
                 >
                   <Play className="w-4 h-4 fill-slate-950" />
-                  <span>Main Cyber Dash Neon</span>
+                  <span>Main Cyber Dash</span>
+                </button>
+
+                <button
+                  id="btn-hero-leaderboard"
+                  onClick={() => {
+                    sound.playClick();
+                    setShowLeaderboardModal(true);
+                  }}
+                  className="px-5 py-3.5 bg-gradient-to-r from-amber-500/20 to-yellow-500/20 hover:from-amber-500/30 hover:to-yellow-500/30 border border-amber-500/40 text-amber-300 font-semibold text-sm rounded-full flex items-center gap-2 transform hover:scale-105 active:scale-95 transition-all cursor-pointer backdrop-blur-md shadow-sm"
+                >
+                  <Trophy className="w-4 h-4 text-amber-400" />
+                  <span>Papan Peringkat (Level #{playerRank})</span>
                 </button>
 
                 <button
@@ -264,10 +302,10 @@ export default function App() {
                     sound.playClick();
                     setShowShopModal(true);
                   }}
-                  className="px-5 py-3.5 bg-gradient-to-r from-amber-500/20 to-yellow-500/20 hover:from-amber-500/30 hover:to-yellow-500/30 border border-amber-500/40 text-amber-300 font-semibold text-sm rounded-full flex items-center gap-2 transform hover:scale-105 active:scale-95 transition-all cursor-pointer backdrop-blur-md"
+                  className="px-5 py-3.5 bg-slate-800/60 hover:bg-slate-700/60 border border-slate-700/60 text-slate-200 font-semibold text-sm rounded-full flex items-center gap-2 transform hover:scale-105 active:scale-95 transition-all cursor-pointer backdrop-blur-md"
                 >
                   <ShoppingBag className="w-4 h-4 text-amber-400" />
-                  <span>Toko Karakter (Beli Avatar)</span>
+                  <span>Toko</span>
                 </button>
 
                 <button
@@ -283,10 +321,21 @@ export default function App() {
 
             {/* Quick Stat Badges */}
             <div className="relative z-10 grid grid-cols-3 gap-3 max-w-md mt-8 pt-6 border-t border-slate-800/80 text-center">
-              <div className="bg-slate-900/50 backdrop-blur-sm p-3 rounded-2xl border border-slate-800/60">
-                <div className="text-lg md:text-xl font-extrabold text-cyan-400 font-mono">8+</div>
-                <div className="text-[11px] text-slate-400">Game Siap Main</div>
-              </div>
+              <button
+                onClick={() => {
+                  sound.playClick();
+                  setShowLeaderboardModal(true);
+                }}
+                className="bg-slate-900/50 hover:bg-slate-800/80 backdrop-blur-sm p-3 rounded-2xl border border-amber-500/30 text-center cursor-pointer transition-all hover:scale-105"
+                title="Buka Papan Peringkat"
+              >
+                <div className="text-lg md:text-xl font-extrabold text-amber-400 font-mono flex items-center justify-center gap-1">
+                  <span>#{playerRank}</span>
+                  <Trophy className="w-3.5 h-3.5 text-amber-400" />
+                </div>
+                <div className="text-[11px] text-amber-300 font-semibold">Peringkat Global</div>
+              </button>
+
               <button
                 onClick={() => {
                   sound.playClick();
@@ -299,12 +348,20 @@ export default function App() {
                   <span>{profile.coins}</span>
                   <ShoppingBag className="w-3.5 h-3.5 text-amber-400" />
                 </div>
-                <div className="text-[11px] text-amber-300 font-semibold">Buka Toko Karakter</div>
+                <div className="text-[11px] text-amber-300 font-semibold">Buka Toko</div>
               </button>
-              <div className="bg-slate-900/50 backdrop-blur-sm p-3 rounded-2xl border border-slate-800/60">
+
+              <button
+                onClick={() => {
+                  sound.playClick();
+                  setShowLeaderboardModal(true);
+                }}
+                className="bg-slate-900/50 hover:bg-slate-800/80 backdrop-blur-sm p-3 rounded-2xl border border-indigo-500/30 text-center cursor-pointer transition-all hover:scale-105"
+                title="Buka Papan Peringkat Level"
+              >
                 <div className="text-lg md:text-xl font-extrabold text-indigo-400 font-mono">Lv.{profile.level}</div>
-                <div className="text-[11px] text-slate-400">Level Pemain</div>
-              </div>
+                <div className="text-[11px] text-indigo-300 font-semibold">Level Pemain</div>
+              </button>
             </div>
           </div>
         )}
@@ -415,6 +472,30 @@ export default function App() {
             setShowProfileModal(false);
             setShowShopModal(true);
           }}
+          onOpenLeaderboard={() => {
+            setShowProfileModal(false);
+            setShowLeaderboardModal(true);
+          }}
+        />
+      )}
+
+      {showLeaderboardModal && (
+        <LeaderboardModal
+          profile={profile}
+          onClose={() => setShowLeaderboardModal(false)}
+          onOpenProfile={() => {
+            setShowLeaderboardModal(false);
+            setShowProfileModal(true);
+          }}
+          onUpdateNickname={handleUpdateNickname}
+        />
+      )}
+
+      {showNicknameModal && (
+        <NicknameModal
+          profile={profile}
+          onClose={() => setShowNicknameModal(false)}
+          onSaveNickname={handleUpdateNickname}
         />
       )}
 

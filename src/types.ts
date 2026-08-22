@@ -70,3 +70,20 @@ export interface DailyQuest {
   claimed: boolean;
   gameId?: string;
 }
+
+export interface LeaderboardPlayer {
+  id: string;
+  rank: number;
+  name: string;
+  avatar: string;
+  avatarIcon: string;
+  level: number;
+  xp: number;
+  totalGamesPlayed: number;
+  tier: 'Bronze' | 'Silver' | 'Gold' | 'Platinum' | 'Diamond' | 'Master' | 'Grandmaster' | 'Nova Legend';
+  tierColor: string;
+  title: string;
+  badge?: string;
+  isCurrentPlayer?: boolean;
+  gameHighScores?: Record<string, number>;
+}
