@@ -22,6 +22,7 @@ import { RandomGameModal } from './components/RandomGameModal';
 import { ShopModal } from './components/ShopModal';
 import { LeaderboardModal } from './components/LeaderboardModal';
 import { NicknameModal } from './components/NicknameModal';
+import { GamePreview } from './components/GamePreview';
 import {
   Award,
   ChevronRight,
@@ -313,126 +314,163 @@ export default function App() {
       <main className="relative z-10 flex-1 max-w-7xl w-full mx-auto px-4 lg:px-8 py-6 space-y-8">
         {/* Featured Hero Banner */}
         {!searchQuery && activeCategory === 'all' && (
-          <div className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-slate-900/90 via-[#0E101A] to-slate-900/90 border border-slate-800/80 p-6 md:p-10 shadow-2xl shadow-indigo-950/40">
+          <div className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-slate-900/90 via-[#0E101A] to-slate-900/90 border border-slate-800/80 p-6 md:p-8 shadow-2xl shadow-indigo-950/40">
             {/* Subtle Grid Pattern */}
             <div className="absolute inset-0 bg-[radial-gradient(#6366f1_1px,transparent_1px)] [background-size:24px_24px] opacity-10" />
 
-            <div className="relative z-10 max-w-2xl">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-400/30 text-indigo-300 text-xs font-semibold mb-4">
-                <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
-                <span>NEXUS ARCADE COLLECTION</span>
+            <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-8">
+              {/* Left Column: Headline & Actions */}
+              <div className="max-w-2xl">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-400/30 text-indigo-300 text-xs font-semibold mb-4">
+                  <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
+                  <span>NEXUS ARCADE COLLECTION</span>
+                </div>
+
+                <h2 className="text-3xl md:text-5xl font-extrabold text-white tracking-tight leading-tight">
+                  Mainkan Game Seru <br />
+                  <span className="bg-gradient-to-r from-indigo-400 via-cyan-300 to-white bg-clip-text text-transparent">
+                    Tanpa Lag & Bebas Iklan
+                  </span>
+                </h2>
+
+                <p className="text-sm md:text-base text-slate-400 mt-3 leading-relaxed">
+                  Nikmati 8+ game arkade seru mulai dari Neon Pong PvP, Cyber Runner, Galaxy Strike, Breakout, hingga
+                  2048 dengan preview visual hidup, efek audio retro 8-bit, sistem level & papan peringkat global!
+                </p>
+
+                {/* Quick Actions in Hero */}
+                <div className="flex flex-wrap items-center gap-3 mt-6">
+                  <button
+                    id="btn-hero-mabar"
+                    onClick={() => handlePlayGame('neon-pong-duel')}
+                    className="px-6 py-3.5 bg-gradient-to-r from-rose-500 via-pink-500 to-amber-500 hover:from-rose-400 hover:to-amber-400 text-white font-black text-sm rounded-full shadow-lg shadow-rose-500/30 flex items-center gap-2 transform hover:scale-105 active:scale-95 transition-all cursor-pointer animate-pulse"
+                  >
+                    <Swords className="w-4 h-4 text-white" />
+                    <span>🎮 Mabar Online 1v1</span>
+                  </button>
+
+                  <button
+                    id="btn-hero-play-featured"
+                    onClick={() => handlePlayGame('cyber-runner')}
+                    className="px-5 py-3.5 bg-gradient-to-r from-indigo-500 to-cyan-400 hover:from-indigo-400 hover:to-cyan-300 text-slate-950 font-bold text-sm rounded-full shadow-lg shadow-indigo-500/25 flex items-center gap-2 transform hover:scale-105 active:scale-95 transition-all cursor-pointer"
+                  >
+                    <Play className="w-4 h-4 fill-slate-950" />
+                    <span>Main Solo</span>
+                  </button>
+
+                  <button
+                    id="btn-hero-leaderboard"
+                    onClick={() => {
+                      sound.playClick();
+                      setShowLeaderboardModal(true);
+                    }}
+                    className="px-5 py-3.5 bg-gradient-to-r from-amber-500/20 to-yellow-500/20 hover:from-amber-500/30 hover:to-yellow-500/30 border border-amber-500/40 text-amber-300 font-semibold text-sm rounded-full flex items-center gap-2 transform hover:scale-105 active:scale-95 transition-all cursor-pointer backdrop-blur-md shadow-sm"
+                  >
+                    <Trophy className="w-4 h-4 text-amber-400" />
+                    <span>Papan Peringkat (Level #{playerRank})</span>
+                  </button>
+
+                  <button
+                    id="btn-hero-shop"
+                    onClick={() => {
+                      sound.playClick();
+                      setShowShopModal(true);
+                    }}
+                    className="px-5 py-3.5 bg-slate-800/60 hover:bg-slate-700/60 border border-slate-700/60 text-slate-200 font-semibold text-sm rounded-full flex items-center gap-2 transform hover:scale-105 active:scale-95 transition-all cursor-pointer backdrop-blur-md"
+                  >
+                    <ShoppingBag className="w-4 h-4 text-amber-400" />
+                    <span>Toko</span>
+                  </button>
+
+                  <button
+                    id="btn-hero-spin"
+                    onClick={() => setShowRandomModal(true)}
+                    className="px-5 py-3.5 bg-slate-800/60 hover:bg-slate-700/60 border border-slate-700/60 text-slate-200 font-semibold text-sm rounded-full flex items-center gap-2 transform hover:scale-105 active:scale-95 transition-all cursor-pointer backdrop-blur-md"
+                  >
+                    <Dices className="w-4 h-4 text-indigo-400" />
+                    <span>Pilih Acak</span>
+                  </button>
+                </div>
+
+                {/* Quick Stat Badges */}
+                <div className="grid grid-cols-3 gap-3 max-w-md mt-6 pt-6 border-t border-slate-800/80 text-center">
+                  <button
+                    onClick={() => {
+                      sound.playClick();
+                      setShowLeaderboardModal(true);
+                    }}
+                    className="bg-slate-900/50 hover:bg-slate-800/80 backdrop-blur-sm p-3 rounded-2xl border border-amber-500/30 text-center cursor-pointer transition-all hover:scale-105"
+                    title="Buka Papan Peringkat"
+                  >
+                    <div className="text-lg md:text-xl font-extrabold text-amber-400 font-mono flex items-center justify-center gap-1">
+                      <span>#{playerRank}</span>
+                      <Trophy className="w-3.5 h-3.5 text-amber-400" />
+                    </div>
+                    <div className="text-[11px] text-amber-300 font-semibold">Peringkat Global</div>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      sound.playClick();
+                      setShowShopModal(true);
+                    }}
+                    className="bg-slate-900/50 hover:bg-slate-800/80 backdrop-blur-sm p-3 rounded-2xl border border-amber-500/30 text-center cursor-pointer transition-all hover:scale-105"
+                    title="Buka Toko Karakter"
+                  >
+                    <div className="text-lg md:text-xl font-extrabold text-amber-400 font-mono flex items-center justify-center gap-1">
+                      <span>{profile.coins}</span>
+                      <ShoppingBag className="w-3.5 h-3.5 text-amber-400" />
+                    </div>
+                    <div className="text-[11px] text-amber-300 font-semibold">Buka Toko</div>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      sound.playClick();
+                      setShowLeaderboardModal(true);
+                    }}
+                    className="bg-slate-900/50 hover:bg-slate-800/80 backdrop-blur-sm p-3 rounded-2xl border border-indigo-500/30 text-center cursor-pointer transition-all hover:scale-105"
+                    title="Buka Papan Peringkat Level"
+                  >
+                    <div className="text-lg md:text-xl font-extrabold text-indigo-400 font-mono">Lv.{profile.level}</div>
+                    <div className="text-[11px] text-indigo-300 font-semibold">Level Pemain</div>
+                  </button>
+                </div>
               </div>
 
-              <h2 className="text-3xl md:text-5xl font-extrabold text-white tracking-tight leading-tight">
-                Mainkan Game Seru <br />
-                <span className="bg-gradient-to-r from-indigo-400 via-cyan-300 to-white bg-clip-text text-transparent">
-                  Tanpa Lag & Bebas Iklan
-                </span>
-              </h2>
-
-              <p className="text-sm md:text-base text-slate-400 mt-3 leading-relaxed">
-                Nikmati 8+ game arkade seru mulai dari Cyber Runner, Galaxy Strike, Breakout, hingga
-                2048 dengan efek audio retro 8-bit, sistem level & papan peringkat global!
-              </p>
-
-              {/* Quick Actions in Hero */}
-              <div className="flex flex-wrap items-center gap-3 mt-6">
-                <button
-                  id="btn-hero-mabar"
+              {/* Right Column: Live Featured Game Showcase Card */}
+              <div className="hidden lg:flex flex-col items-center w-80 shrink-0">
+                <div 
                   onClick={() => handlePlayGame('neon-pong-duel')}
-                  className="px-6 py-3.5 bg-gradient-to-r from-rose-500 via-pink-500 to-amber-500 hover:from-rose-400 hover:to-amber-400 text-white font-black text-sm rounded-full shadow-lg shadow-rose-500/30 flex items-center gap-2 transform hover:scale-105 active:scale-95 transition-all cursor-pointer animate-pulse"
+                  className="group w-full bg-slate-900/70 border border-rose-500/40 hover:border-rose-400 rounded-3xl p-4 shadow-xl shadow-rose-950/30 cursor-pointer transition-all duration-300 hover:scale-105"
                 >
-                  <Swords className="w-4 h-4 text-white" />
-                  <span>🎮 Mabar Online 1v1</span>
-                </button>
+                  <div className="flex items-center justify-between mb-3 px-1">
+                    <span className="text-[11px] font-extrabold text-rose-400 flex items-center gap-1.5 font-mono">
+                      <span className="w-2 h-2 rounded-full bg-rose-500 animate-ping" />
+                      FEATURED DUEL
+                    </span>
+                    <span className="text-[10px] text-slate-400 font-bold bg-slate-800 px-2 py-0.5 rounded-full border border-slate-700">
+                      1v1 ONLINE
+                    </span>
+                  </div>
 
-                <button
-                  id="btn-hero-play-featured"
-                  onClick={() => handlePlayGame('cyber-runner')}
-                  className="px-5 py-3.5 bg-gradient-to-r from-indigo-500 to-cyan-400 hover:from-indigo-400 hover:to-cyan-300 text-slate-950 font-bold text-sm rounded-full shadow-lg shadow-indigo-500/25 flex items-center gap-2 transform hover:scale-105 active:scale-95 transition-all cursor-pointer"
-                >
-                  <Play className="w-4 h-4 fill-slate-950" />
-                  <span>Main Solo</span>
-                </button>
+                  <div className="relative w-full h-44 rounded-2xl overflow-hidden border border-slate-700/60 bg-slate-950 shadow-inner">
+                    <GamePreview gameId="neon-pong-duel" isHovered={true} />
+                    <div className="absolute inset-0 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%)] bg-[size:100%_4px] pointer-events-none opacity-40" />
+                  </div>
 
-                <button
-                  id="btn-hero-leaderboard"
-                  onClick={() => {
-                    sound.playClick();
-                    setShowLeaderboardModal(true);
-                  }}
-                  className="px-5 py-3.5 bg-gradient-to-r from-amber-500/20 to-yellow-500/20 hover:from-amber-500/30 hover:to-yellow-500/30 border border-amber-500/40 text-amber-300 font-semibold text-sm rounded-full flex items-center gap-2 transform hover:scale-105 active:scale-95 transition-all cursor-pointer backdrop-blur-md shadow-sm"
-                >
-                  <Trophy className="w-4 h-4 text-amber-400" />
-                  <span>Papan Peringkat (Level #{playerRank})</span>
-                </button>
-
-                <button
-                  id="btn-hero-shop"
-                  onClick={() => {
-                    sound.playClick();
-                    setShowShopModal(true);
-                  }}
-                  className="px-5 py-3.5 bg-slate-800/60 hover:bg-slate-700/60 border border-slate-700/60 text-slate-200 font-semibold text-sm rounded-full flex items-center gap-2 transform hover:scale-105 active:scale-95 transition-all cursor-pointer backdrop-blur-md"
-                >
-                  <ShoppingBag className="w-4 h-4 text-amber-400" />
-                  <span>Toko</span>
-                </button>
-
-                <button
-                  id="btn-hero-spin"
-                  onClick={() => setShowRandomModal(true)}
-                  className="px-5 py-3.5 bg-slate-800/60 hover:bg-slate-700/60 border border-slate-700/60 text-slate-200 font-semibold text-sm rounded-full flex items-center gap-2 transform hover:scale-105 active:scale-95 transition-all cursor-pointer backdrop-blur-md"
-                >
-                  <Dices className="w-4 h-4 text-indigo-400" />
-                  <span>Pilih Acak</span>
-                </button>
+                  <div className="mt-3.5 flex items-center justify-between">
+                    <div>
+                      <h4 className="text-sm font-bold text-white group-hover:text-rose-300 transition-colors">Neon Pong Duel PvP</h4>
+                      <p className="text-[11px] text-slate-400">Duel tenis meja online real-time</p>
+                    </div>
+                    <button className="px-3.5 py-1.5 bg-gradient-to-r from-rose-500 to-amber-500 text-white font-bold text-xs rounded-full shadow-md flex items-center gap-1">
+                      <Play className="w-3 h-3 fill-white" />
+                      <span>Main</span>
+                    </button>
+                  </div>
+                </div>
               </div>
-            </div>
-
-            {/* Quick Stat Badges */}
-            <div className="relative z-10 grid grid-cols-3 gap-3 max-w-md mt-8 pt-6 border-t border-slate-800/80 text-center">
-              <button
-                onClick={() => {
-                  sound.playClick();
-                  setShowLeaderboardModal(true);
-                }}
-                className="bg-slate-900/50 hover:bg-slate-800/80 backdrop-blur-sm p-3 rounded-2xl border border-amber-500/30 text-center cursor-pointer transition-all hover:scale-105"
-                title="Buka Papan Peringkat"
-              >
-                <div className="text-lg md:text-xl font-extrabold text-amber-400 font-mono flex items-center justify-center gap-1">
-                  <span>#{playerRank}</span>
-                  <Trophy className="w-3.5 h-3.5 text-amber-400" />
-                </div>
-                <div className="text-[11px] text-amber-300 font-semibold">Peringkat Global</div>
-              </button>
-
-              <button
-                onClick={() => {
-                  sound.playClick();
-                  setShowShopModal(true);
-                }}
-                className="bg-slate-900/50 hover:bg-slate-800/80 backdrop-blur-sm p-3 rounded-2xl border border-amber-500/30 text-center cursor-pointer transition-all hover:scale-105"
-                title="Buka Toko Karakter"
-              >
-                <div className="text-lg md:text-xl font-extrabold text-amber-400 font-mono flex items-center justify-center gap-1">
-                  <span>{profile.coins}</span>
-                  <ShoppingBag className="w-3.5 h-3.5 text-amber-400" />
-                </div>
-                <div className="text-[11px] text-amber-300 font-semibold">Buka Toko</div>
-              </button>
-
-              <button
-                onClick={() => {
-                  sound.playClick();
-                  setShowLeaderboardModal(true);
-                }}
-                className="bg-slate-900/50 hover:bg-slate-800/80 backdrop-blur-sm p-3 rounded-2xl border border-indigo-500/30 text-center cursor-pointer transition-all hover:scale-105"
-                title="Buka Papan Peringkat Level"
-              >
-                <div className="text-lg md:text-xl font-extrabold text-indigo-400 font-mono">Lv.{profile.level}</div>
-                <div className="text-[11px] text-indigo-300 font-semibold">Level Pemain</div>
-              </button>
             </div>
           </div>
         )}

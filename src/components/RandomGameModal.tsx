@@ -4,6 +4,7 @@ import { GAMES_DATA } from '../data/games';
 import { sound } from '../utils/audio';
 import { fireCelebrationConfetti } from '../utils/storage';
 import { Dices, Play, Sparkles, X } from 'lucide-react';
+import { GamePreview } from './GamePreview';
 
 interface RandomGameModalProps {
   onClose: () => void;
@@ -76,16 +77,20 @@ export const RandomGameModal: React.FC<RandomGameModalProps> = ({
         </p>
 
         {/* Display Card */}
-        <div className="w-full p-4 rounded-2xl bg-slate-900/40 border border-slate-800/60 flex flex-col items-center mb-6">
-          <div className={`w-full h-32 rounded-xl bg-gradient-to-br ${currentGame.bannerGradient} border border-slate-700/30 flex flex-col items-center justify-center p-4 transition-all duration-150`}>
-            <span className="text-3xl mb-1">🎮</span>
-            <h4 className="text-base font-bold text-white tracking-wide">{currentGame.title}</h4>
-            <span className="text-xs text-white/80 font-medium">{currentGame.categoryName}</span>
+        <div className="w-full p-3 rounded-2xl bg-slate-900/60 border border-slate-800/80 flex flex-col items-center mb-6">
+          <div className="relative w-full h-36 rounded-xl overflow-hidden border border-slate-700/50 shadow-inner bg-slate-950 flex flex-col items-center justify-center">
+            <GamePreview gameId={currentGame.id} isHovered={true} />
+            <div className="absolute top-2 left-2 z-10 px-2 py-0.5 rounded-full bg-black/70 border border-white/20 text-[10px] font-bold text-white backdrop-blur-md">
+              {currentGame.categoryName}
+            </div>
           </div>
 
-          <p className="text-xs text-slate-300 mt-3 px-2 line-clamp-2">
-            {currentGame.description}
-          </p>
+          <div className="mt-3 text-center">
+            <h4 className="text-base font-bold text-white tracking-wide">{currentGame.title}</h4>
+            <p className="text-xs text-slate-300 mt-1 px-2 line-clamp-2 leading-relaxed">
+              {currentGame.description}
+            </p>
+          </div>
         </div>
 
         {/* Action Buttons */}
